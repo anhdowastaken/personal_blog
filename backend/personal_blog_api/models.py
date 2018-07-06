@@ -10,6 +10,11 @@ from .application import bcrypt
 
 db = SQLAlchemy()
 
+post_tag = db.Table('posts_tags',
+    db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True)
+)
+
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
@@ -41,10 +46,10 @@ class Post(db.Model):
     body = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_edit_at = db.Column(db.DateTime, default=datetime.utcnow)
-    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     comments = db.relationship('Comment', backref='comment', lazy='dynamic')
     tags = db.relationship('Tag',
-                           secondary=tags,
+                           secondary=post_tag,
                            lazy='subquery',
                            backref=db.backref('posts', lazy=True))
 
@@ -57,6 +62,8 @@ class Post(db.Model):
                     header=self.header)
 
 class Tag(db.Model):
+    __tablename__ = 'tags'
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String)
 
@@ -67,12 +74,7 @@ class Comment(db.Model):
     content = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_edit_at = db.Column(db.DateTime, default=datetime.utcnow)
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
     author_name = db.Column(db.String)
     author_email = db.Column(db.String)
     belong_to_post_author = db.Column(db.Boolean, default=False)
-
-tags = db.Table('tags',
-    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True),
-    db.Column('post_id', db.Integer, db.ForeignKey('post.id'), primary_key=True)
-)
