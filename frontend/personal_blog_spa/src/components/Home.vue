@@ -4,7 +4,20 @@
         <logout v-else></logout>
         <div v-for="post in posts" :key="post.id">
             <h3>{{ post.header }}</h3>
-            <p>{{ post.body }}</p>
+            <div v-html="post.body"></div>
+        </div>
+
+        <div v-if="isAuthenticated">
+        <input type="text" class="form-control" v-model="header">
+            <div>
+                <trumbowyg v-model="body"
+                           :config="config"
+                           class="form-control" name="content"></trumbowyg>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block"
+                    v-on:click.stop.prevent="submitNewPost()"
+                    v-on:submit.stop.prevent="submitNewPost()"
+                    v-bind:disabled="!isHttpRequestCompleted">Submit</button>
         </div>
     </div>
 </template>
@@ -19,6 +32,7 @@ import Logout from '@/components/Logout'
 
 import { fetchAllPosts } from '@/api'
 import { fetchPublicPosts } from '@/api'
+import { createNewPost } from '@/api'
 import { key_jwt, key_user_data } from '@/common'
 
 export default {
@@ -29,6 +43,13 @@ export default {
     },
     data () {
         return {
+            header: '',
+            body: '<h1>YEAH! It works!!!</h1>',
+            config: {
+                // Any option from 
+                // https://alex-d.github.io/Trumbowyg/documentation/#basic-options
+            },
+            isHttpRequestCompleted: true
         }
     },
     beforeMount() {
@@ -68,7 +89,10 @@ export default {
     methods: {
         ...mapMutations([
             'setPosts'
-        ])
+        ]),
+        submitNewPost: function() {
+            createNewPost(this.jwt, this.header, this.body)
+        }
     }
 }
 </script>

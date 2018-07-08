@@ -5,6 +5,10 @@ import App from './App'
 import router from './router'
 import store from './store'
 
+import VueTrumbowyg from 'vue-trumbowyg'
+import 'trumbowyg/dist/ui/trumbowyg.css'
+Vue.use(VueTrumbowyg)
+
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

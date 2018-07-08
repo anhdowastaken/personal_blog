@@ -43,3 +43,13 @@ export function submitChangePassword(jwt, old_password, new_password) {
                       { headers: { Authorization: `Bearer: ${jwt}` } }
                     )
 }
+
+export function createNewPost(jwt, header, body) {
+    return axios.create({ withCredentials: true })
+                .post(`${API_URL}/create_new_post`,
+                      { header: header,
+                        body: body
+                      },
+                      { headers: { Authorization: `Bearer: ${jwt}` } }
+                    )
+}

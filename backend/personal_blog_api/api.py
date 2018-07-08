@@ -284,3 +284,33 @@ def get_public_posts():
     response.status_code = 200
 
     return response
+
+@api.route('/create_new_post', methods=['POST'])
+@token_required
+@login_required
+def create_new_post(jwt_user):
+    if jwt_user.id != current_user.id:
+        return jsonify(dict(message='Re-authentication required', created=False)), 401
+
+    registered_user = User.query.filter_by(id=jwt_user.id).first()
+    if registered_user is None:
+        return jsonify(dict(message='Permission denied', created=False)), 401
+
+    data = request.get_json()
+    header = data['header']
+    body = data['body']
+
+    post = Post()
+    post.header = header
+    post.body = body
+    post.author_id = jwt_user.id
+    try:
+        db.session.add(post)
+        db.session.commit()
+
+        return jsonify(dict(message='New post was created successfully',
+                            created=True)), 201
+    except (SQLAlchemyError) as e:
+        # TODO: Use logger
+        print(e)
+        return jsonify(dict(message='Create new post failed', created=False)), 500
