@@ -8,7 +8,7 @@ from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
 from personal_blog_api.application import create_app
-from personal_blog_api.models import db, User
+from personal_blog_api.models import db, User, Post, Comment, Tag
 
 app = create_app()
 
@@ -23,7 +23,10 @@ manager.add_command('db', MigrateCommand)
 def shell_ctx():
     return dict(app=app,
                 db=db,
-                User=User)
+                User=User,
+                Post=Post,
+                Comment=Comment,
+                Tag=Tag)
 
 if __name__ == '__main__':
     manager.run()

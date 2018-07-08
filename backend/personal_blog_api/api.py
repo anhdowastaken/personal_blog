@@ -21,7 +21,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import jwt
 from .application import bcrypt
 from .config import BaseConfig
-from .models import db, User
+from .models import db, User, Post
 
 api = Blueprint('api', __name__)
 
@@ -247,3 +247,40 @@ def change_password(jwt_user):
         # TODO: Use logger
         print(e)
         return jsonify(dict(message='Changed failed', registered=False)), 500
+
+@api.route('/get_all_posts', methods=['GET'])
+@token_required
+@login_required
+def get_all_posts(jwt_user):
+    if jwt_user.id != current_user.id:
+        return jsonify(dict(message='Re-authentication required')), 401
+
+    registered_user = User.query.filter_by(id=jwt_user.id).first()
+    if registered_user is None:
+        return jsonify(dict(message='Permission denied')), 401
+
+    all_posts = Post.query.all()
+    json_public_posts = []
+    for p in all_posts:
+        json_public_posts.append(p.to_dict())
+
+    json_response = json.dumps(json_public_posts)
+    response = Response(json_response, content_type='application/json; charset=utf-8')
+    response.headers.add('content-length', len(json_response))
+    response.status_code = 200
+
+    return response
+
+@api.route('/get_public_posts', methods=['GET'])
+def get_public_posts():
+    public_posts = Post.query.filter(Post.private_post == False).all()
+    json_public_posts = []
+    for p in public_posts:
+        json_public_posts.append(p.to_dict())
+
+    json_response = json.dumps(json_public_posts)
+    response = Response(json_response, content_type='application/json; charset=utf-8')
+    response.headers.add('content-length', len(json_response))
+    response.status_code = 200
+
+    return response

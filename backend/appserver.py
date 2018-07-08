@@ -8,20 +8,16 @@ if __name__ == '__main__':
     app = create_app()
 
     app.app_context().push()
+    from personal_blog_api.config import BaseConfig
     from personal_blog_api.models import db
     from personal_blog_api.models import User
-    admin = User.query.filter(User.username == 'admin').filter(User.role == 'admin').first()
-    if admin is None:
-        admin = User('admin', '123456')
-        admin.role = 'admin'
-        db.session.add(admin)
-        db.session.commit()
+    config = BaseConfig()
+    blog_owner = User.query.filter(User.email == config.BLOG_OWNER_EMAIL).filter(User.username == config.BLOG_OWNER_USERNAME).filter(User.role == 'admin').first()
 
-    user = User.query.filter(User.username == 'dq2nd').filter(User.role == 'user').first()
-    if user is None:
-        user = User('dq2nd', '123456')
-        user.role = 'user'
-        db.session.add(user)
+    if blog_owner is None:
+        blog_owner = User(config.BLOG_OWNER_EMAIL, config.BLOG_OWNER_USERNAME, config.BLOG_OWNER_PASSWORD)
+        blog_owner.role = 'admin'
+        db.session.add(blog_owner)
         db.session.commit()
 
     app.run()
