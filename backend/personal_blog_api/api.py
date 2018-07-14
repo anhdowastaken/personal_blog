@@ -60,46 +60,9 @@ def token_required(f):
             # TODO: Use logger
             print(e)
             return jsonify(dict(message="Backend error",
-                                authenticated=False)), 401
+                                authenticated=False)), 500
 
     return _verify
-
-@api.route('/register', methods=['POST'])
-@token_required
-@login_required
-def register(jwt_user):
-    if jwt_user.id != current_user.id:
-        # User ID stored in JWT token does not match the one stored in session
-        # It's better to re-authenticate
-        return jsonify(dict(message='Re-authentication required', registered=False)), 401
-
-    data = request.get_json()
-    username = data['username']
-    if username == '':
-        return jsonify(dict(message='Empty username isn\'t allowed', registered=False)), 400
-
-    registered_user = User.query.filter_by(username=username).first()
-    if registered_user is None:
-        # Generate random string containing 8 characters
-        password = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(8))
-
-        user = User(username, password)
-        try:
-            db.session.add(user)
-            db.session.commit()
-
-            return jsonify(dict(message='Register successfully',
-                                registered=True,
-                                user_data=dict(id=user.id,
-                                               username=username,
-                                               password=password,
-                                               role=user.role))), 201
-        except (SQLAlchemyError) as e:
-            # TODO: Use logger
-            print(e)
-            return jsonify(dict(message='Register failed', registered=False)), 500
-    else:
-        return jsonify(dict(message='User existed', registered=False)), 400
 
 @api.route('/reset_password', methods=['POST'])
 @token_required
@@ -135,44 +98,6 @@ def reset_password(jwt_user):
             # TODO: Use logger
             print(e)
             return jsonify(dict(message='Reset failed', registered=False)), 500
-    else:
-        return jsonify(dict(message='User doesn\'t exist', registered=False)), 400
-
-@api.route('/delete_user', methods=['POST'])
-@token_required
-@login_required
-def delete_user(jwt_user):
-    if jwt_user.id != current_user.id:
-        # User ID stored in JWT token does not match the one stored in session
-        # It's better to re-authenticate
-        return jsonify(dict(message='Re-authentication required', delete=False)), 401
-
-    # Only admin has permission to reset password
-    if current_user.role != 'admin':
-        return jsonify(dict(message='Permission denied', delete=False)), 403
-
-    data = request.get_json()
-    username = data['username']
-    registered_user = User.query.filter_by(username=username).first()
-    if registered_user is not None:
-        if registered_user.role == 'admin':
-            return jsonify(dict(message='Permission denied', delete=False)), 403
-
-        try:
-            # Delete all predictions of the user
-            predictions = Prediction.query.filter_by(user_id=registered_user.id).all()
-            for p in predictions:
-                db.session.delete(p)
-                db.session.commit()
-
-            db.session.delete(registered_user)
-            db.session.commit()
-
-            return jsonify(dict(message='Delete successfully', delete=True)), 201
-        except (SQLAlchemyError) as e:
-            # TODO: Use logger
-            print(e)
-            return jsonify(dict(message='Delete failed', registered=False)), 500
     else:
         return jsonify(dict(message='User doesn\'t exist', registered=False)), 400
 
@@ -259,31 +184,44 @@ def get_all_posts(jwt_user):
     if registered_user is None:
         return jsonify(dict(message='Permission denied')), 401
 
-    all_posts = Post.query.order_by(Post.created_at.desc()).all()
-    json_public_posts = []
-    for p in all_posts:
-        json_public_posts.append(p.to_dict())
+    page = request.args.get('page', 1, type=int)
+    posts_per_page = BaseConfig().POSTS_PER_PAGE
+    all_posts = get_posts(registered_user.id, True, page, posts_per_page)
 
-    json_response = json.dumps(json_public_posts)
-    response = Response(json_response, content_type='application/json; charset=utf-8')
-    response.headers.add('content-length', len(json_response))
-    response.status_code = 200
+    json_all_posts = []
+    for p in all_posts.items:
+        json_all_posts.append(p.to_dict())
 
-    return response
+    return jsonify(dict(posts=json_all_posts,
+                        has_next=all_posts.has_next,
+                        has_prev=all_posts.has_prev,
+                        next_num=all_posts.next_num,
+                        prev_num=all_posts.prev_num)), 200
 
 @api.route('/get_public_posts', methods=['GET'])
 def get_public_posts():
-    public_posts = Post.query.filter(Post.private_post == False).order_by(Post.created_at.desc()).all()
-    json_public_posts = []
-    for p in public_posts:
-        json_public_posts.append(p.to_dict())
+    page = request.args.get('page', 1, type=int)
+    posts_per_page = BaseConfig().POSTS_PER_PAGE
+    all_posts = get_posts(None, False, page, posts_per_page)
 
-    json_response = json.dumps(json_public_posts)
-    response = Response(json_response, content_type='application/json; charset=utf-8')
-    response.headers.add('content-length', len(json_response))
-    response.status_code = 200
+    json_all_posts = []
+    for p in all_posts.items:
+        json_all_posts.append(p.to_dict())
 
-    return response
+    return jsonify(dict(posts=json_all_posts,
+                        has_next=all_posts.has_next,
+                        has_prev=all_posts.has_prev,
+                        next_num=all_posts.next_num,
+                        prev_num=all_posts.prev_num)), 200
+
+def get_posts(author_id, including_private, page, posts_per_page):
+    if author_id is None:
+        return Post.query.filter(Post.private_post == False).order_by(Post.created_at.desc()).paginate(page, posts_per_page, False)
+
+    if including_private == True:
+        return Post.query.filter(Post.author_id == author_id).order_by(Post.created_at.desc()).paginate(page, posts_per_page, False)
+    else:
+        return Post.query.filter(Post.author_id == author_id).filter(Post.private_post == False).order_by(Post.created_at.desc()).paginate(page, posts_per_page, False)
 
 @api.route('/create_new_post', methods=['POST'])
 @token_required

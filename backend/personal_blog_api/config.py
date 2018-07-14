@@ -13,3 +13,5 @@ class BaseConfig(object):
     BLOG_OWNER_EMAIL = 'doducanh2710@gmail.com'
     BLOG_OWNER_USERNAME = 'anhdo'
     BLOG_OWNER_PASSWORD = '123456'
+
+    POSTS_PER_PAGE = 10

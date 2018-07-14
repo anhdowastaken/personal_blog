@@ -16,21 +16,29 @@ export default {
     },
     methods: {
         ...mapMutations([
-            'setPosts'
+            'setPosts',
+            'setPageInfo'
         ]),
         logout: function() {
             this.$store.dispatch('logout')
                 .then(() => {
-                    window.location = '/'
-                    // FIXME: How to fetch when come back to home?
-                    // fetchPublicPosts()
-                    //     .then(response => {
-                    //         if (response.status === 200) {
-                    //             let posts = response.data
-                    //             this.setPosts({ posts: posts })
-                    //         }
-                    //         this.$router.push({ name: 'Home' })
-                    //     })
+                    let page = 1
+                    if (this.$router.currentRoute['name'] == 'Home') {
+                        fetchPublicPosts(page)
+                            .then(response => {
+                                if (response.status === 200) {
+                                    this.setPosts({ posts: response.data['posts'] })
+                                    this.setPageInfo({ currentPage: page,
+                                                       has_next: response.data['has_next'],
+                                                       has_prev: response.data['has_prev'],
+                                                       next_num: response.data['next_num'],
+                                                       prev_num: response.data['prev_num']
+                                                     })
+                                }
+                            })
+                    } else {
+                        this.$router.push('/')
+                    }
                 })
         }
     }

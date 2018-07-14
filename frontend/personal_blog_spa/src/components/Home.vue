@@ -5,9 +5,11 @@
         <router-link to="/new_post" v-if="isAuthenticated">new post</router-link>
         <div v-for="post in posts" :key="post.id">
             <router-link :to="{ name: 'Post', params: { post_id: post.post_id }}"><h3>{{ post.header }}</h3></router-link>
-            <!-- <router-link :to="{ name: 'Post', params: { post_id: post.id } }"><h3>{{ post.header }}</h3></router-link> -->
-            <!-- <div v-html="post.body"></div> -->
         </div>
+        <a v-if="has_prev"
+           v-on:click.stop.prevent="fetchPosts(prev_num)">&lt;</a>
+        <a v-if="has_next"
+           v-on:click.stop.prevent="fetchPosts(next_num)">&gt;</a>
     </div>
 </template>
 
@@ -39,23 +41,9 @@ export default {
         }
     },
     beforeMount() {
-        if (this.isAuthenticated) {
-            fetchAllPosts(this.jwt)
-                .then(response => {
-                    if (response.status === 200) {
-                        let posts = response.data
-                        this.setPosts({ posts: posts })
-                    }
-                })
-        } else {
-            fetchPublicPosts()
-                .then(response => {
-                    if (response.status === 200) {
-                        let posts = response.data
-                        this.setPosts({ posts: posts })
-                    }
-                })
-        }
+        this.$nextTick(() => {
+            this.fetchPosts(this.currentPage)
+        })
     },
     computed: {
         ...mapState({
@@ -66,7 +54,12 @@ export default {
                     return localStorage.getItem(key_jwt)
                 }
             },
-            posts: state => state.posts
+            posts: state => state.posts,
+            currentPage: state => state.currentPage,
+            has_next: state => state.has_next,
+            has_prev: state => state.has_prev,
+            next_num: state => state.next_num,
+            prev_num: state => state.prev_num
         }),
         ...mapGetters([
             'isAuthenticated',
@@ -74,8 +67,38 @@ export default {
     },
     methods: {
         ...mapMutations([
-            'setPosts'
-        ])
+            'setPosts',
+            'setPageInfo'
+        ]),
+        fetchPosts: function(page) {
+            if (this.isAuthenticated) {
+                fetchAllPosts(this.jwt, page)
+                    .then(response => {
+                        if (response.status === 200) {
+                            this.setPosts({ posts: response.data['posts'] })
+                            this.setPageInfo({ currentPage: page,
+                                               has_next: response.data['has_next'],
+                                               has_prev: response.data['has_prev'],
+                                               next_num: response.data['next_num'],
+                                               prev_num: response.data['prev_num']
+                                             })
+                        }
+                    })
+            } else {
+                fetchPublicPosts(page)
+                    .then(response => {
+                        if (response.status === 200) {
+                            this.setPosts({ posts: response.data['posts'] })
+                            this.setPageInfo({ currentPage: page,
+                                               has_next: response.data['has_next'],
+                                               has_prev: response.data['has_prev'],
+                                               next_num: response.data['next_num'],
+                                               prev_num: response.data['prev_num']
+                                             })
+                        }
+                    })
+            }
+        }
     }
 }
 </script>

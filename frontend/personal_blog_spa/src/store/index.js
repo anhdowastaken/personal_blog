@@ -17,6 +17,11 @@ const state = {
     // This state object will contain data that can be accessed and watched for
     // changes by any components interested in them such as the Home component.
     posts: [],
+    currentPage: 1,
+    has_next: false,
+    has_prev: false,
+    next_num: 1,
+    prev_num: 1,
     userData: {},
     jwt: '',
     // States of notification modal
@@ -60,6 +65,13 @@ const mutations = {
     // the now reactive data in the state object are updated with the new values, causing the UI to update and re-render its elements.
     setPosts(state, payload) {
         state.posts = payload.posts
+    },
+    setPageInfo(state, payload) {
+        state.currentPage = payload.currentPage
+        state.has_next = payload.has_next
+        state.has_prev = payload.has_prev
+        state.next_num = payload.next_num
+        state.prev_num = payload.prev_num
     },
     setUserData(state, payload) {
         console.log('setUserData payload = ', payload)

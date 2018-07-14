@@ -2,16 +2,16 @@ import axios from 'axios'
 
 const API_URL = 'http://127.0.0.1:5000/api'
 
-export function fetchAllPosts(jwt) {
+export function fetchAllPosts(jwt, page) {
     return axios.create({ withCredentials: true })
-                .get(`${API_URL}/get_all_posts`,
+                .get(`${API_URL}/get_all_posts?page=${page}`,
                       { headers: { Authorization: `Bearer: ${jwt}` } }
                     )
 }
 
-export function fetchPublicPosts() {
+export function fetchPublicPosts(page) {
     return axios.create({ withCredentials: true })
-                .get(`${API_URL}/get_public_posts`)
+                .get(`${API_URL}/get_public_posts?page=${page}`)
 }
 
 export function submitLogin(username, password) {
