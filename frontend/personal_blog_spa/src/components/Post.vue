@@ -3,6 +3,7 @@
         <router-link to="/login" v-if="!isAuthenticated">login</router-link>
         <logout v-else></logout>
         <router-link to="/new_post" v-if="isAuthenticated">new post</router-link>
+        <back></back>
 
         <div v-if="post">
             <h3>{{ post.header }}</h3>
@@ -18,6 +19,7 @@ import { mapMutations } from 'vuex'
 
 import Login from '@/components/Login'
 import Logout from '@/components/Logout'
+import Back from '@/components/Back'
 
 import { fetchPost } from '@/api'
 import { key_jwt, key_user_data } from '@/common'
@@ -26,7 +28,8 @@ export default {
     name: 'Post',
     components: {
         Login,
-        Logout
+        Logout,
+        Back
     },
     data () {
         return {

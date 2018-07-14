@@ -35,7 +35,7 @@ const actions = {
     logout(context) {
         return submitLogout()
             .then(() => {
-                context.commit('setMatches', { matches: [] })
+                context.commit('setPosts', { posts: [] })
                 context.commit('removeJwtToken')
                 context.commit('removeUserData')
             })

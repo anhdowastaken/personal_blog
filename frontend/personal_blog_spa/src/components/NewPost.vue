@@ -2,6 +2,7 @@
     <div>
         <router-link to="/login" v-if="!isAuthenticated">login</router-link>
         <logout v-else></logout>
+        <back></back>
 
         <div v-if="isAuthenticated">
         <input type="text" class="form-control" v-model="header">
@@ -24,6 +25,7 @@ import { mapGetters } from 'vuex'
 
 import Login from '@/components/Login'
 import Logout from '@/components/Logout'
+import Back from '@/components/Back'
 
 import { createNewPost } from '@/api'
 import { key_jwt, key_user_data } from '@/common'
@@ -32,7 +34,8 @@ export default {
     name: 'NewPost',
     components: {
         Login,
-        Logout
+        Logout,
+        Back
     },
     data () {
         return {
