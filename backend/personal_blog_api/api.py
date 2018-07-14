@@ -259,7 +259,7 @@ def get_all_posts(jwt_user):
     if registered_user is None:
         return jsonify(dict(message='Permission denied')), 401
 
-    all_posts = Post.query.all()
+    all_posts = Post.query.order_by(Post.created_at.desc()).all()
     json_public_posts = []
     for p in all_posts:
         json_public_posts.append(p.to_dict())
@@ -273,7 +273,7 @@ def get_all_posts(jwt_user):
 
 @api.route('/get_public_posts', methods=['GET'])
 def get_public_posts():
-    public_posts = Post.query.filter(Post.private_post == False).all()
+    public_posts = Post.query.filter(Post.private_post == False).order_by(Post.created_at.desc()).all()
     json_public_posts = []
     for p in public_posts:
         json_public_posts.append(p.to_dict())
@@ -314,3 +314,52 @@ def create_new_post(jwt_user):
         # TODO: Use logger
         print(e)
         return jsonify(dict(message='Create new post failed', created=False)), 500
+
+@api.route('/get_post', methods=['GET'])
+def get_post():
+    auth_headers = request.headers.get('Authorization', '').split()
+    post_id = request.args.get('post_id')
+    registered_user = None
+
+    if auth_headers:
+        if len(auth_headers) != 2:
+            return jsonify(dict(message="Invalid token. Authentication required",
+                                get=False)), 401
+
+        try:
+            token = auth_headers[1]
+            data = jwt.decode(token, BaseConfig().SECRET_KEY)
+            registered_user = User.query.filter_by(id=data['sub']).first()
+            if not registered_user:
+                return jsonify(dict(message="Can't recognize user stored in token",
+                                    get=False)), 401
+        except jwt.ExpiredSignatureError:
+            return jsonify(dict(message="Expired token. Re-authentication required.",
+                                get=False)), 401
+        except (jwt.InvalidTokenError) as e:
+            # TODO: Use logger
+            print(e)
+            return jsonify(dict(message="Invalid token. Authentication required",
+                                get=False)), 401
+        except (Exception) as e:
+            # TODO: Use logger
+            print(e)
+            return jsonify(dict(message="Backend error",
+                                get=False)), 401
+
+    post = None
+    if registered_user:
+        post = Post.query.filter(Post.id == post_id).filter(Post.author_id == registered_user.id).first()
+    else:
+        post = Post.query.filter(Post.id == post_id).filter(Post.private_post == False).first()
+
+    if post:
+        json_response = json.dumps(post.to_dict())
+        response = Response(json_response, content_type='application/json; charset=utf-8')
+        response.headers.add('content-length', len(json_response))
+        response.status_code = 200
+
+        return response
+    else:
+        return jsonify(dict(message="Post doesn't exist",
+                            get=False)), 404

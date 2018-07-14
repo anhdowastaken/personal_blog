@@ -1,23 +1,12 @@
 <template>
     <div>
-        <login v-if="!isAuthenticated"></login>
+        <router-link to="/login" v-if="!isAuthenticated">login</router-link>
         <logout v-else></logout>
+        <router-link to="/new_post" v-if="isAuthenticated">new post</router-link>
         <div v-for="post in posts" :key="post.id">
-            <h3>{{ post.header }}</h3>
-            <div v-html="post.body"></div>
-        </div>
-
-        <div v-if="isAuthenticated">
-        <input type="text" class="form-control" v-model="header">
-            <div>
-                <trumbowyg v-model="body"
-                           :config="config"
-                           class="form-control" name="content"></trumbowyg>
-            </div>
-            <button class="btn btn-lg btn-primary btn-block"
-                    v-on:click.stop.prevent="submitNewPost()"
-                    v-on:submit.stop.prevent="submitNewPost()"
-                    v-bind:disabled="!isHttpRequestCompleted">Submit</button>
+            <router-link :to="{ name: 'Post', params: { post_id: post.post_id }}"><h3>{{ post.header }}</h3></router-link>
+            <!-- <router-link :to="{ name: 'Post', params: { post_id: post.id } }"><h3>{{ post.header }}</h3></router-link> -->
+            <!-- <div v-html="post.body"></div> -->
         </div>
     </div>
 </template>
@@ -29,26 +18,23 @@ import { mapMutations } from 'vuex'
 
 import Login from '@/components/Login'
 import Logout from '@/components/Logout'
+import NewPost from '@/components/NewPost'
+import Post from '@/components/Post'
 
 import { fetchAllPosts } from '@/api'
 import { fetchPublicPosts } from '@/api'
-import { createNewPost } from '@/api'
 import { key_jwt, key_user_data } from '@/common'
 
 export default {
     name: 'Home',
     components: {
         Login,
-        Logout
+        Logout,
+        NewPost,
+        Post
     },
     data () {
         return {
-            header: '',
-            body: '<h1>YEAH! It works!!!</h1>',
-            config: {
-                // Any option from 
-                // https://alex-d.github.io/Trumbowyg/documentation/#basic-options
-            },
             isHttpRequestCompleted: true
         }
     },
@@ -89,10 +75,7 @@ export default {
     methods: {
         ...mapMutations([
             'setPosts'
-        ]),
-        submitNewPost: function() {
-            createNewPost(this.jwt, this.header, this.body)
-        }
+        ])
     }
 }
 </script>

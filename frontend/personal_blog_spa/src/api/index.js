@@ -53,3 +53,15 @@ export function createNewPost(jwt, header, body) {
                       { headers: { Authorization: `Bearer: ${jwt}` } }
                     )
 }
+
+export function fetchPost(jwt, post_id) {
+    if (jwt) {
+        return axios.create({ withCredentials: true })
+                    .get(`${API_URL}/get_post?post_id=${post_id}`,
+                          { headers: { Authorization: `Bearer: ${jwt}` } }
+                        )
+    } else {
+        return axios.create({ withCredentials: true })
+                    .get(`${API_URL}/get_post?post_id=${post_id}`)
+    }
+}

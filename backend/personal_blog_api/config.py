@@ -11,5 +11,5 @@ class BaseConfig(object):
     SECRET_KEY = 'puSCIAp7PvykT7w0d48U'
 
     BLOG_OWNER_EMAIL = 'doducanh2710@gmail.com'
-    BLOG_OWNER_USERNAME = 'dq2nd'
+    BLOG_OWNER_USERNAME = 'anhdo'
     BLOG_OWNER_PASSWORD = '123456'
