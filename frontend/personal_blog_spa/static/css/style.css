@@ -2341,6 +2341,10 @@ span.email-notes {
   padding-top: 30px;
 }
 
+.blog-pagination {
+  text-align: center;
+}
+
 /*----------------------------------------
  .End CSS
 ----------------------------------------*/
