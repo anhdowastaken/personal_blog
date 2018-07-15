@@ -49,18 +49,23 @@
                   <div class="col-md-12 col-sm-12 col-xs-12"
                        v-for="post in posts" :key="post.id">
                     <div class="single-blog">
-                      <!-- <div class="blog-meta">
-                        <span class="comments-type">
-                          <i class="fa fa-comment-o"></i>
-                          <a href="#">11 comments</a>
-                        </span>
+                      <div class="blog-meta">
                         <span class="date-type">
-                          <i class="fa fa-calendar"></i>2016-03-05 / 09:10:16
+                          <i class="fa fa-calendar"></i>{{ post.last_edit_at }}
                         </span>
-                      </div> -->
+                        <span class="comments-type"
+                              v-if="post.comments.length == 1">
+                          <i class="fa fa-comment-o"></i> 1 comment
+                        </span>
+                        <span class="comments-type"
+                              v-else-if="post.comments.length > 1">
+                          <i class="fa fa-comment-o"></i> {{ post.comments.length }} comments
+                        </span>
+                      </div>
                       <div class="blog-text">
                         <router-link :to="{ name: 'Post', params: { post_id: post.post_id }}">
                             <h4>{{ post.header }}</h4>
+                            <p style="color: gray;">{{ post.preview }}</p>
                         </router-link>
                       </div>
                       <!-- <span>

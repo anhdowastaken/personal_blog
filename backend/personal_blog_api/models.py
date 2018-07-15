@@ -66,8 +66,18 @@ class Post(db.Model):
         for c in self.comments:
             comments.append(c.to_dict())
 
+        import re
+        html_tags = re.compile('<.*?>')
+        clean_body = re.sub(html_tags, '', self.body)
+        preview = ' '.join(clean_body.split()[:20])
+        if preview != clean_body:
+            preview = preview + '&hellip;'
+        import html
+        preview = html.unescape(preview)
+
         return dict(post_id=self.id,
                     header=self.header,
+                    preview=preview,
                     body=self.body,
                     last_edit_at=self.last_edit_at,
                     author_name=User.query.filter(User.id == self.author_id).first().username,

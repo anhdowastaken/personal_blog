@@ -68,25 +68,20 @@ export default {
             body: '',
             config: {
                 modules: {
-                    // toolbar: '#toolbar'
                     toolbar: {
                         container: [
-                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        ['blockquote', 'code-block'],
-                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                        [{ 'script': 'sub' }, { 'script': 'super' }],
-                        [{ 'indent': '-1' }, { 'indent': '+1' }],
-                        [{ 'font': [] }],
-                        [{ 'color': [] }, { 'background': [] }],
-                        [{ 'align': [] }],
-                        // ['link', 'image', 'video'], // FIXME: Enable uploading image
-                            ['clean'],
-                            ['submit']
-                        ],
-                        handlers: {
-                            'submit': () => { this.submitNewPost() }
-                        }
+                            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            ['blockquote', 'code-block'],
+                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                            [{ 'script': 'sub' }, { 'script': 'super' }],
+                            [{ 'indent': '-1' }, { 'indent': '+1' }],
+                            [{ 'font': [] }],
+                            [{ 'color': [] }, { 'background': [] }],
+                            [{ 'align': [] }],
+                            // ['link', 'image', 'video'], // FIXME: Enable uploading image
+                            ['clean']
+                        ]
                     }
                 }
             },
