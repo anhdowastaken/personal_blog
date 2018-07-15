@@ -1,8 +1,7 @@
 <template>
     <div>
-        <router-link to="/login" v-if="!isAuthenticated">login</router-link>
-        <logout v-else></logout>
-        <back></back>
+        <header-component></header-component>
+        <header-image-component></header-image-component>
 
         <div v-if="isAuthenticated">
         <input type="text" class="form-control" v-model="header">
@@ -16,6 +15,8 @@
                     v-on:submit.stop.prevent="submitNewPost()"
                     v-bind:disabled="!isHttpRequestCompleted">Submit</button>
         </div>
+
+        <footer-component></footer-component>
     </div>
 </template>
 
@@ -23,6 +24,9 @@
 import { mapState } from 'vuex' 
 import { mapGetters } from 'vuex'
 
+import HeaderComponent from '@/components/HeaderComponent'
+import HeaderImageComponent from '@/components/HeaderImageComponent'
+import FooterComponent from '@/components/FooterComponent'
 import Login from '@/components/Login'
 import Logout from '@/components/Logout'
 import Back from '@/components/Back'
@@ -33,6 +37,9 @@ import { key_jwt, key_user_data } from '@/common'
 export default {
     name: 'NewPost',
     components: {
+        HeaderComponent,
+        HeaderImageComponent,
+        FooterComponent,
         Login,
         Logout,
         Back
