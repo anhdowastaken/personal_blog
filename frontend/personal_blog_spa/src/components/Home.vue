@@ -8,9 +8,9 @@
             <div class="row">
               <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                 <div class="page-head-blog">
-                  <div class="single-blog-page">
+                  <div class="single-blog-page" v-if="isAuthenticated">
                     <div class="left-blog">
-                      <router-link to="/new_post" v-if="isAuthenticated">new post</router-link>
+                      <router-link to="/new_post">new post</router-link>
                     </div>
                   </div>
                   <div class="single-blog-page">

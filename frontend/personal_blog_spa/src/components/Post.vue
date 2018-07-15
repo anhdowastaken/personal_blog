@@ -72,7 +72,7 @@
                           </ul>
                         </div>
                       </div>
-                      <comment-form></comment-form>
+                      <comment-form v-bind:post="post"></comment-form>
                     </div>
                     <!-- single-blog end -->
                   </div>
@@ -157,16 +157,6 @@ export default {
         ...mapGetters([
             'isAuthenticated',
         ])
-    },
-    methods: {
-        postComment: function() {
-            if (this.isAuthenticated) {
-                console.log(this.userData)
-                submitComment(this.jwt, this.post_id, this.content, this.userData['username'], this.userData['email'])
-            } else {
-                submitComment(this.jwt, this.post_id, this.content, this.author_name, this.author_email)
-            }
-        }
     }
 }
 </script>

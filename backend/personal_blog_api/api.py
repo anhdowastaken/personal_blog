@@ -368,7 +368,8 @@ def post_comment():
         db.session.commit()
 
         return jsonify(dict(message='New comment was posted successfully',
-                            created=True)), 201
+                            created=True,
+                            comment=comment.to_dict())), 201
     except (SQLAlchemyError) as e:
         # TODO: Use logger
         print(e)

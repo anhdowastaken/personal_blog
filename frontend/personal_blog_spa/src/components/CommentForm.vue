@@ -59,6 +59,7 @@ export default {
             isHttpRequestCompleted: true
         }
     },
+    props: ['post'],
     computed: {
         ...mapState({
             jwt: function(state) {
@@ -83,11 +84,20 @@ export default {
     methods: {
         postComment: function() {
             if (this.isAuthenticated) {
-                console.log(this.userData)
-                submitComment(this.jwt, this.post_id, this.content, this.userData['username'], this.userData['email'])
-            } else {
-                submitComment(this.jwt, this.post_id, this.content, this.author_name, this.author_email)
+                this.author_name = this.userData['username']
+                this.author_email = this.userData['email']
             }
+            submitComment(this.jwt, this.post.post_id, this.content, this.author_name, this.author_email)
+                .then(response => {
+                    if (response.status == 201) {
+                        this.author_name = ''
+                        this.author_email = ''
+                        this.content = ''
+
+                        let comment = response.data['comment']
+                        this.post.comments.push(comment)
+                    }
+                })
         }
     }
 }
