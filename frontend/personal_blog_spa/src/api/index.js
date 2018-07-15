@@ -71,7 +71,7 @@ export function submitComment(jwt, post_id, content, author_name, author_email) 
                           { headers: { Authorization: `Bearer: ${jwt}` } })
     } else {
         return axios.create({ withCredentials: true })
-                    .post(`${API_URL}/get_post?post_id=${post_id}`,
+                    .post(`${API_URL}/post_comment`,
                           { post_id: post_id,
                             content: content,
                             author_name: author_name,

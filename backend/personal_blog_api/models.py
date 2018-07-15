@@ -4,6 +4,7 @@ models.py
 """
 
 from datetime import datetime
+from hashlib import md5
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from .application import bcrypt
@@ -69,6 +70,7 @@ class Post(db.Model):
                     header=self.header,
                     body=self.body,
                     last_edit_at=self.last_edit_at,
+                    author_name=User.query.filter(User.id == self.author_id).first().username,
                     comments=comments)
 
 class Tag(db.Model):
@@ -93,8 +95,11 @@ class Comment(db.Model):
         return '%d\t%d\t%s' % (self.id, self.post_id, self.author_email)
 
     def to_dict(self):
+        digest = md5(self.author_email.lower().encode('utf-8')).hexdigest()
+        avatar = 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(digest, 50)
+
         return dict(comment_id=self.id,
                     content=self.content,
                     author_name=self.author_name,
-                    author_email=self.author_email,
+                    author_avatar=avatar,
                     created_at=self.created_at)

@@ -26,22 +26,9 @@
                     <!-- search option end -->
                   </div>
                   <div class="single-blog-page">
-                    <div class="left-blog">
-                      <h4>archive</h4>
-                      <ul>
-                        <li>
-                          <a href="#">July 2016</a>
-                        </li>
-                        <li>
-                          <a href="#">June 2016</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                  <div class="single-blog-page">
                     <div class="left-tags blog-tags">
                       <div class="popular-tag left-side-tags left-blog">
-                        <h4>popular tags</h4>
+                        <h4>tags</h4>
                         <ul>
                           <li>
                             <a href="#">life</a>
