@@ -21,7 +21,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import jwt
 from .application import bcrypt
 from .config import BaseConfig
-from .models import db, User, Post
+from .models import db, User, Post, Comment
 
 api = Blueprint('api', __name__)
 
@@ -131,6 +131,7 @@ def login():
                             token=token.decode('utf-8'),
                             user_data=dict(user_id=registered_user.id,
                                            username=registered_user.username,
+                                           email=registered_user.email,
                                            role=registered_user.role,
                                            last_login_at=int(last_login_at.timestamp())))), 200
     else:
@@ -292,12 +293,83 @@ def get_post():
         post = Post.query.filter(Post.id == post_id).filter(Post.private_post == False).first()
 
     if post:
-        json_response = json.dumps(post.to_dict())
-        response = Response(json_response, content_type='application/json; charset=utf-8')
-        response.headers.add('content-length', len(json_response))
-        response.status_code = 200
-
-        return response
+        return jsonify(post.to_dict()), 200
     else:
         return jsonify(dict(message="Post doesn't exist",
                             get=False)), 404
+
+@api.route('/post_comment', methods=['POST'])
+def post_comment():
+    auth_headers = request.headers.get('Authorization', '').split()
+    data = request.get_json()
+    post_id = data['post_id']
+    content = data['content']
+    author_name = data['author_name']
+    author_email = data['author_email']
+    registered_user = None
+
+    post = Post.query.filter(Post.id == post_id).first()
+    if post is None:
+        return jsonify(dict(message="Post doesn't exist",
+                            created=False)), 404
+
+    if content == '':
+        return jsonify(dict(message="Content must not be empty",
+                            created=False)), 400
+
+    if author_name == '':
+        return jsonify(dict(message="Author name must not be empty",
+                            created=False)), 400
+
+    if author_email == '':
+        return jsonify(dict(message="Author email must not be empty",
+                            created=False)), 400
+
+    if auth_headers:
+        if len(auth_headers) != 2:
+            return jsonify(dict(message="Invalid token. Authentication required",
+                                created=False)), 401
+
+        try:
+            token = auth_headers[1]
+            data = jwt.decode(token, BaseConfig().SECRET_KEY)
+            registered_user = User.query.filter_by(id=data['sub']).first()
+            if not registered_user:
+                return jsonify(dict(message="Can't recognize user stored in token",
+                                    created=False)), 401
+        except jwt.ExpiredSignatureError:
+            return jsonify(dict(message="Expired token. Re-authentication required.",
+                                created=False)), 401
+        except (jwt.InvalidTokenError) as e:
+            # TODO: Use logger
+            print(e)
+            return jsonify(dict(message="Invalid token. Authentication required",
+                                created=False)), 401
+        except (Exception) as e:
+            # TODO: Use logger
+            print(e)
+            return jsonify(dict(message="Backend error",
+                                created=False)), 401
+
+    comment = Comment()
+    comment.post_id = post_id
+    comment.content = content
+    if registered_user:
+        comment.author_name = registered_user.username
+        comment.author_email = registered_user.email
+        comment.belong_to_post_author = True
+    else:
+        comment.author_name = author_name
+        comment.author_email = author_email
+        comment.belong_to_post_author = False
+
+    try:
+        db.session.add(comment)
+        db.session.commit()
+
+        return jsonify(dict(message='New comment was posted successfully',
+                            created=True)), 201
+    except (SQLAlchemyError) as e:
+        # TODO: Use logger
+        print(e)
+        return jsonify(dict(message='Post new comment failed', created=False)), 500

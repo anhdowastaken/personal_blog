@@ -61,9 +61,15 @@ class Post(db.Model):
         return '%d\t%d\t%s' % (self.id, self.user_id, self.header)
 
     def to_dict(self):
+        comments = []
+        for c in self.comments:
+            comments.append(c.to_dict())
+
         return dict(post_id=self.id,
                     header=self.header,
-                    body=self.body)
+                    body=self.body,
+                    last_edit_at=self.last_edit_at,
+                    comments=comments)
 
 class Tag(db.Model):
     __tablename__ = 'tags'
@@ -82,3 +88,13 @@ class Comment(db.Model):
     author_name = db.Column(db.String, nullable=False)
     author_email = db.Column(db.String, nullable=False)
     belong_to_post_author = db.Column(db.Boolean, default=False)
+
+    def __repr__(self):
+        return '%d\t%d\t%s' % (self.id, self.post_id, self.author_email)
+
+    def to_dict(self):
+        return dict(comment_id=self.id,
+                    content=self.content,
+                    author_name=self.author_name,
+                    author_email=self.author_email,
+                    created_at=self.created_at)
