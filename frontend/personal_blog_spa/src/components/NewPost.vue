@@ -7,9 +7,9 @@
         <div v-if="isAuthenticated">
         <input type="text" class="form-control" v-model="header">
             <div>
-                <trumbowyg v-model="body"
-                           :config="config"
-                           class="form-control" name="content"></trumbowyg>
+                <quill-editor v-model="body"
+                              v-bind:options="config">
+                </quill-editor>
             </div>
             <button class="btn btn-lg btn-primary btn-block"
                     v-on:click.stop.prevent="submitNewPost()"
@@ -40,21 +40,23 @@ export default {
     data () {
         return {
             header: '',
-            body: '<h1>YEAH! It works!!!</h1>',
+            body: 'YEAH! It works!!!',
             config: {
-                // Any option from 
-                // https://alex-d.github.io/Trumbowyg/documentation/#basic-options
-                btns: [
-                    ['formatting'],
-                    ['strong', 'em', 'del'],
-                    ['superscript', 'subscript'],
-                    ['link'],
-                    ['insertImage'],
-                    ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
-                    ['unorderedList', 'orderedList'],
-                    ['horizontalRule'],
-                    ['removeformat'],
-                ]
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        [{ 'script': 'sub' }, { 'script': 'super' }],
+                        [{ 'indent': '-1' }, { 'indent': '+1' }],
+                        [{ 'font': [] }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'align': [] }],
+                        // ['link', 'image', 'video'], // FIXME: Enable uploading image
+                        ['clean']
+                    ]
+                }
             },
             isHttpRequestCompleted: true
         }
