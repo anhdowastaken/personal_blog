@@ -238,11 +238,13 @@ def create_new_post(jwt_user):
     data = request.get_json()
     header = data['header']
     body = data['body']
+    private_post = data['private_post']
 
     post = Post()
     post.header = header
     post.body = body
     post.author_id = jwt_user.id
+    post.private_post = private_post
     try:
         db.session.add(post)
         db.session.commit()
@@ -374,3 +376,40 @@ def post_comment():
         # TODO: Use logger
         print(e)
         return jsonify(dict(message='Post new comment failed', created=False)), 500
+
+@api.route('/delete_post', methods=['DELETE'])
+@token_required
+@login_required
+def delete_post(jwt_user):
+    if jwt_user.id != current_user.id:
+        return jsonify(dict(message='Re-authentication required', deleted=False)), 401
+
+    registered_user = User.query.filter_by(id=jwt_user.id).first()
+    if registered_user is None:
+        return jsonify(dict(message='Permission denied', deleted=False)), 401
+
+    data = request.get_json()
+    post_id = data['post_id']
+
+    post = Post.query.filter(Post.id == post_id).first()
+    if post is None:
+        return jsonify(dict(message="Post doesn't exist",
+                            deleted=False)), 404
+
+    # Delete all comments of post first
+    comments = Comment.query.filter(Comment.post_id == post_id).all()
+    for c in comments:
+        db.session.delete(c)
+
+    # Delete post
+    db.session.delete(post)
+    try:
+        db.session.commit()
+
+        return jsonify(dict(message='Post was deleted successfully',
+                            deleted=True)), 200
+    except (SQLAlchemyError) as e:
+        # TODO: Use logger
+        print(e)
+        db.session.rollback()
+        return jsonify(dict(message='Create new post failed', deleted=False)), 500

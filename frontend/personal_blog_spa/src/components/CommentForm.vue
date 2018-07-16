@@ -28,7 +28,7 @@
           <input type="email" v-model="author_email"/>
         </div>
         <div class="col-lg-12 col-md-12 col-sm-12 comment-form-comment">
-          <p>Comment</p>
+          <p>Comment *</p>
           <textarea id="message-box" cols="30" rows="10" v-model="content"></textarea>
           <input type="submit" value="Post Comment"
                  v-on:click.stop.prevent="postComment()"

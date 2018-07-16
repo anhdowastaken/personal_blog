@@ -40,11 +40,12 @@ export function submitChangePassword(jwt, old_password, new_password) {
                       { headers: { Authorization: `Bearer: ${jwt}` } })
 }
 
-export function createNewPost(jwt, header, body) {
+export function createNewPost(jwt, header, body, private_post) {
     return axios.create({ withCredentials: true })
                 .post(`${API_URL}/create_new_post`,
                       { header: header,
-                        body: body
+                        body: body,
+                        private_post: private_post
                       },
                       { headers: { Authorization: `Bearer: ${jwt}` } })
 }
@@ -77,4 +78,11 @@ export function submitComment(jwt, post_id, content, author_name, author_email) 
                             author_name: author_name,
                             author_email: author_email })
     }
+}
+
+export function submitDeletePost(jwt, post_id) {
+    return axios.create({ withCredentials: true })
+                .delete(`${API_URL}/delete_post`,
+                       { headers: { Authorization: `Bearer: ${jwt}` },
+                         data: { post_id: post_id } })
 }

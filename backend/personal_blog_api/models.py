@@ -81,7 +81,8 @@ class Post(db.Model):
                     body=self.body,
                     last_edit_at=self.last_edit_at,
                     author_name=User.query.filter(User.id == self.author_id).first().username,
-                    comments=comments)
+                    comments=comments,
+                    private_post=self.private_post)
 
 class Tag(db.Model):
     __tablename__ = 'tags'

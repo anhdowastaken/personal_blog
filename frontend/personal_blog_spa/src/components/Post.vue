@@ -8,6 +8,18 @@
             <div class="row">
               <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                 <div class="page-head-blog">
+                  <div class="single-blog-page" v-if="isAuthenticated">
+                    <button type="button"
+                            class="btn btn-primary btn-block btn-edit-post"
+                            v-on:click.stop.prevent="$router.push('/edit_post')"
+                            v-bind:disabled="!isHttpRequestCompleted">edit post</button>
+                  </div>
+                  <div class="single-blog-page" v-if="isAuthenticated">
+                    <button type="button"
+                            class="btn btn-danger btn-block btn-delete-post"
+                            v-on:click.stop.prevent="deletePost()"
+                            v-bind:disabled="!isHttpRequestCompleted">delete post</button>
+                  </div>
                   <div class="single-blog-page">
                     <!-- search option start -->
                     <form action="#">
@@ -54,7 +66,7 @@
                             <a href="#">life</a>
                           </span>
                           <span v-if="post.comments.length == 1"><i class="fa fa-comments-o"></i>1 comment</span>
-                          <span v-else-if="post.comments.length > 1"><i class="fa fa-comments-o"></i>{{ post.comments.length }} comment(s)</span>
+                          <span v-else-if="post.comments.length > 1"><i class="fa fa-comments-o"></i>{{ post.comments.length }} comments</span>
                         </div>
                         <div class="entry-content" v-html="post.body"></div>
                       </div>
@@ -64,7 +76,7 @@
                       <div class="comments-area" v-if="post.comments.length">
                         <div class="comments-heading">
                           <h3 v-if="post.comments.length == 1">1 comment</h3>
-                          <h3 v-else-if="post.comments.length > 1">{{ post.comments.length }} comment(s)</h3>
+                          <h3 v-else-if="post.comments.length > 1">{{ post.comments.length }} comments</h3>
                         </div>
                         <div class="comments-list">
                           <ul>
@@ -103,6 +115,7 @@ import CommentForm from '@/components/CommentForm'
 
 import { fetchPost } from '@/api'
 import { submitComment } from '@/api'
+import { submitDeletePost } from '@/api'
 import { isEmpty } from '@/utils'
 import { key_jwt, key_user_data } from '@/common'
 
@@ -157,10 +170,47 @@ export default {
         ...mapGetters([
             'isAuthenticated',
         ])
+    },
+    methods: {
+        deletePost: function() {
+            if (confirm('Are you sure?')) {
+                this.isHttpRequestCompleted = false
+                submitDeletePost(this.jwt, this.post_id)
+                    .then(response => {
+                        this.isHttpRequestCompleted = true
+                        if (response.status === 200) {
+                            this.$router.push({ name: "Home" })
+                        }
+                    })
+                    .catch(error => {
+                        this.isHttpRequestCompleted = true
+                        if (error.response.data['message']) {
+                            this.setNotificationContent({ header: 'Error',
+                                                          body: error.response.data['message'] })
+                            this.showNotification()
+                        } else if (error) {
+                            this.setNotificationContent({ header: 'Error',
+                                                          body: 'Error Authenticating: ' + error })
+                            this.showNotification()
+                        } else {
+                            this.setNotificationContent({ header: 'Error',
+                                                          body: 'Error' })
+                            this.showNotification()
+                        }
+                    })
+            }
+        }
     }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.btn-edit-post {
+  margin-bottom: 10px;
+}
+
+.btn-delete-post {
+  margin-bottom: 30px;
+}
 </style>

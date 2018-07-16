@@ -12,15 +12,31 @@
                        id="newpost-form-title"
                        placeholder="Title"
                        v-model="header">
+
                 <quill-editor id="newpost-form-editor"
                               v-model="body"
                               v-bind:options="config">
                 </quill-editor>
-                <button class="btn btn-lg btn-primary btn-block"
-                        id="newpost-form-button-submit"
-                        v-on:click.stop.prevent="submitNewPost()"
-                        v-on:submit.stop.prevent="submitNewPost()"
-                        v-bind:disabled="!isHttpRequestCompleted">Submit</button>
+
+                <div>
+                  <label>Private</label>
+                  <label class="switch">
+                    <input type="checkbox" v-model="private_post">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <div>
+                  <button class="btn btn-primary"
+                          id="newpost-form-button-submit"
+                          v-on:click.stop.prevent="submitNewPost()"
+                          v-on:submit.stop.prevent="submitNewPost()"
+                          v-bind:disabled="!isHttpRequestCompleted">Submit</button>
+                  <button class="btn btn-danger"
+                          id="newpost-form-button-discard"
+                          v-on:click.stop.prevent="discardNewPost()"
+                          v-bind:disabled="!isHttpRequestCompleted">Discard</button>
+                </div>
               </div>
             </div>
           </div>
@@ -33,6 +49,7 @@
 <script>
 import { mapState } from 'vuex' 
 import { mapGetters } from 'vuex'
+import { mapMutations } from 'vuex'
 
 import HeaderComponent from '@/components/HeaderComponent'
 import HeaderImageComponent from '@/components/HeaderImageComponent'
@@ -59,13 +76,13 @@ export default {
         FooterComponent,
         Login,
         Logout,
-        Back,
         quillEditor
     },
     data () {
         return {
             header: '',
             body: '',
+            private_post: true,
             config: {
                 modules: {
                     toolbar: {
@@ -104,13 +121,46 @@ export default {
         ])
     },
     methods: {
+        ...mapMutations([
+            'setNotificationContent',
+            'showNotification'
+        ]),
         submitNewPost: function() {
-            createNewPost(this.jwt, this.header, this.body)
-                .then(response => {
-                    if (response.status == 201) {
-                        this.$router.push('/')
-                    }
-                })
+            if (this.header == '') {
+                this.setNotificationContent({ header: 'Error',
+                                              body: 'Title can\'t be empty' })
+                this.showNotification()
+            } else {
+                this.isHttpRequestCompleted = false
+                createNewPost(this.jwt, this.header, this.body, this.private_post)
+                    .then(response => {
+                        this.isHttpRequestCompleted = true
+                        if (response.status === 201) {
+                            this.$router.push({ name: "Home" })
+                        }
+                    })
+                    .catch(error => {
+                        this.isHttpRequestCompleted = true
+                        if (error.response.data['message']) {
+                            this.setNotificationContent({ header: 'Error',
+                                                          body: error.response.data['message'] })
+                            this.showNotification()
+                        } else if (error) {
+                            this.setNotificationContent({ header: 'Error',
+                                                          body: 'Error Authenticating: ' + error })
+                            this.showNotification()
+                        } else {
+                            this.setNotificationContent({ header: 'Error',
+                                                          body: 'Error' })
+                            this.showNotification()
+                        }
+                    })
+            }
+        },
+        discardNewPost: function() {
+            if (confirm('Are you sure?')) {
+                this.$router.push('/')
+            }
         }
     }
 }
@@ -126,7 +176,68 @@ export default {
     height: 375px;
 }
 
-#newpost-form-button-submit {
+#newpost-form-button-submit,
+#newpost-form-button-discard {
     margin-top: 20px;
+}
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  margin-top: 20px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {display:none;}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 24px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
 </style>

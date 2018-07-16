@@ -9,9 +9,9 @@
               <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                 <div class="page-head-blog">
                   <div class="single-blog-page" v-if="isAuthenticated">
-                    <div class="left-blog">
-                      <router-link to="/new_post">new post</router-link>
-                    </div>
+                    <button type="button"
+                            class="btn btn-primary btn-block btn-new-post"
+                            v-on:click.stop.prevent="$router.push('/new_post')">new post</button>
                   </div>
                   <div class="single-blog-page">
                     <!-- search option start -->
@@ -61,6 +61,8 @@
                               v-else-if="post.comments.length > 1">
                           <i class="fa fa-comment-o"></i> {{ post.comments.length }} comments
                         </span>
+                        <span v-if="isAuthenticated && post.private_post"
+                              class="label label-default">Private</span>
                       </div>
                       <div class="blog-text">
                         <router-link :to="{ name: 'Post', params: { post_id: post.post_id }}">
@@ -193,4 +195,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.btn-new-post {
+  margin-bottom: 30px;
+}
 </style>
