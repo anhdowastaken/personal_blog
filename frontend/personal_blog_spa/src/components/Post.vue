@@ -11,7 +11,7 @@
                   <div class="single-blog-page" v-if="isAuthenticated">
                     <button type="button"
                             class="btn btn-primary btn-block btn-edit-post"
-                            v-on:click.stop.prevent="$router.push('/edit_post')"
+                            v-on:click.stop.prevent="$router.push({ name: 'EditPost', params: { post_id: post_id}})"
                             v-bind:disabled="!isHttpRequestCompleted">edit post</button>
                   </div>
                   <div class="single-blog-page" v-if="isAuthenticated">
@@ -133,9 +133,6 @@ export default {
     data () {
         return {
             post: undefined,
-            content: '',
-            author_name: '',
-            author_email: '',
             isHttpRequestCompleted: true
         }
     },

@@ -412,4 +412,41 @@ def delete_post(jwt_user):
         # TODO: Use logger
         print(e)
         db.session.rollback()
-        return jsonify(dict(message='Create new post failed', deleted=False)), 500
+        return jsonify(dict(message='Delete post failed', deleted=False)), 500
+
+@api.route('/update_post', methods=['PUT'])
+@token_required
+@login_required
+def update_post(jwt_user):
+    if jwt_user.id != current_user.id:
+        return jsonify(dict(message='Re-authentication required', updated=False)), 401
+
+    registered_user = User.query.filter_by(id=jwt_user.id).first()
+    if registered_user is None:
+        return jsonify(dict(message='Permission denied', updated=False)), 401
+
+    data = request.get_json()
+    post_id = data['post_id']
+    header = data['header']
+    body = data['body']
+    private_post = data['private_post']
+
+    post = Post.query.filter(Post.id == post_id).first()
+    if post is None:
+        return jsonify(dict(message="Post doesn't exist",
+                            updated=False)), 404
+
+    post.header = header
+    post.body = body
+    post.private_post = private_post
+    post.last_edit_at = datetime.utcnow()
+    try:
+        db.session.add(post)
+        db.session.commit()
+
+        return jsonify(dict(message='Post was updated successfully',
+                            updated=True)), 200
+    except (SQLAlchemyError) as e:
+        # TODO: Use logger
+        print(e)
+        return jsonify(dict(message='Update post failed', updated=False)), 500

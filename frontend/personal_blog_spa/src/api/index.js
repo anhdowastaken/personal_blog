@@ -86,3 +86,14 @@ export function submitDeletePost(jwt, post_id) {
                        { headers: { Authorization: `Bearer: ${jwt}` },
                          data: { post_id: post_id } })
 }
+
+export function submitUpdatePost(jwt, post_id, header, body, private_post) {
+    return axios.create({ withCredentials: true })
+                .put(`${API_URL}/update_post`,
+                     { post_id: post_id,
+                       header: header,
+                       body: body,
+                       private_post: private_post
+                     },
+                     { headers: { Authorization: `Bearer: ${jwt}` } })
+}
