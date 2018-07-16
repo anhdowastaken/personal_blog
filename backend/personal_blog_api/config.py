@@ -9,6 +9,7 @@ class BaseConfig(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # String is used for encryption and session management
     SECRET_KEY = 'puSCIAp7PvykT7w0d48U'
+    RECAPTCHA_SECRECT_KEY = '6LeNYWQUAAAAAJBkKykVTndhvGRBdUNKKewCFHFD'
 
     BLOG_OWNER_EMAIL = 'doducanh2710@gmail.com'
     BLOG_OWNER_USERNAME = 'anhdo'

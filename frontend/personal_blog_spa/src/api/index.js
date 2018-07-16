@@ -61,7 +61,7 @@ export function fetchPost(jwt, post_id) {
     }
 }
 
-export function submitComment(jwt, post_id, content, author_name, author_email) {
+export function submitComment(jwt, post_id, content, author_name, author_email, recaptcha_response) {
     if (jwt) {
         return axios.create({ withCredentials: true })
                     .post(`${API_URL}/post_comment`,
@@ -76,7 +76,8 @@ export function submitComment(jwt, post_id, content, author_name, author_email) 
                           { post_id: post_id,
                             content: content,
                             author_name: author_name,
-                            author_email: author_email })
+                            author_email: author_email,
+                            recaptcha_response: recaptcha_response })
     }
 }
 

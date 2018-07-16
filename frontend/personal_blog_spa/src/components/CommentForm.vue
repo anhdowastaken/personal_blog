@@ -30,6 +30,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12 comment-form-comment">
           <p>Comment *</p>
           <textarea id="message-box" cols="30" rows="10" v-model="content"></textarea>
+          <div class="g-recaptcha" :data-sitekey="rcapt_sig_key"></div>
           <input type="submit" value="Post Comment"
                  v-on:click.stop.prevent="postComment()"
                  v-on:submit.stop.prevent="postComment()"/>
@@ -46,6 +47,7 @@ import { mapGetters } from 'vuex'
 import { submitComment } from '@/api'
 import { isEmpty } from '@/utils'
 import { key_jwt, key_user_data } from '@/common'
+import { recaptcha_data_sitekey } from '@/common'
 
 export default {
     name: 'Post',
@@ -56,10 +58,17 @@ export default {
             content: '',
             author_name: '',
             author_email: '',
+            rcapt_sig_key: recaptcha_data_sitekey,
+            rcapt_id: 0,
             isHttpRequestCompleted: true
         }
     },
     props: ['post'],
+    mounted() {
+        if (!this.isAuthenticated) {
+            this.initReCaptcha()
+        }
+    },
     computed: {
         ...mapState({
             jwt: function(state) {
@@ -82,12 +91,35 @@ export default {
         ])
     },
     methods: {
+        initReCaptcha: function () {
+            setTimeout(() => {
+                if (typeof grecaptcha === 'undefined' || typeof grecaptcha.render ==='undefined') {
+                    this.initReCaptcha();
+                } else {
+                    try {
+                        this.rcapt_id = grecaptcha.render($('.g-recaptcha')[0], { sitekey : this.rcapt_sig_key });
+                    } catch (error) {
+                        // FIXME: Error: reCAPTCHA has already been rendered in this element
+                        console.log(error)
+                    }
+                }
+            }, 100);
+        },
         postComment: function() {
+            let recaptcha_response = ''
+
             if (this.isAuthenticated) {
                 this.author_name = this.userData['username']
                 this.author_email = this.userData['email']
+            } else {
+                recaptcha_response = grecaptcha.getResponse(this.rcapt_id);
+                if (recaptcha_response.length == 0) {
+                    alert("Please complete captcha challenge!")
+                    return
+                }
             }
-            submitComment(this.jwt, this.post.post_id, this.content, this.author_name, this.author_email)
+
+            submitComment(this.jwt, this.post.post_id, this.content, this.author_name, this.author_email, recaptcha_response)
                 .then(response => {
                     if (response.status == 201) {
                         this.author_name = ''

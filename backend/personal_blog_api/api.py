@@ -308,6 +308,7 @@ def post_comment():
     content = data['content']
     author_name = data['author_name']
     author_email = data['author_email']
+    recaptcha_response = data['recaptcha_response']
     registered_user = None
 
     post = Post.query.filter(Post.id == post_id).first()
@@ -315,16 +316,16 @@ def post_comment():
         return jsonify(dict(message="Post doesn't exist",
                             created=False)), 404
 
-    if content == '':
-        return jsonify(dict(message="Content must not be empty",
-                            created=False)), 400
-
     if author_name == '':
         return jsonify(dict(message="Author name must not be empty",
                             created=False)), 400
 
     if author_email == '':
         return jsonify(dict(message="Author email must not be empty",
+                            created=False)), 400
+
+    if content == '':
+        return jsonify(dict(message="Content must not be empty",
                             created=False)), 400
 
     if auth_headers:
@@ -352,6 +353,10 @@ def post_comment():
             print(e)
             return jsonify(dict(message="Backend error",
                                 created=False)), 401
+    else:
+        if recaptcha_response is None or recaptcha_response == '' or not is_human(recaptcha_response):
+           return jsonify(dict(message="reCaptcha is invalid",
+                               created=False)), 400
 
     comment = Comment()
     comment.post_id = post_id
@@ -450,3 +455,14 @@ def update_post(jwt_user):
         # TODO: Use logger
         print(e)
         return jsonify(dict(message='Update post failed', updated=False)), 500
+
+def is_human(captcha_response):
+    """ Validating recaptcha response from google server
+        Returns True captcha test passed for submitted form else returns False.
+    """
+    secret = BaseConfig().RECAPTCHA_SECRECT_KEY
+    payload = {'response':captcha_response, 'secret':secret}
+    response = requests.post("https://www.google.com/recaptcha/api/siteverify", payload)
+    response_text = json.loads(response.text)
+
+    return response_text['success']
