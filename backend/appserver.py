@@ -3,11 +3,12 @@ appserver.py
 - Create an application instance and run the dev server
 """
 
-if __name__ == '__main__':  
-    from personal_blog_api.application import create_app
-    app = create_app()
+from personal_blog_api.application import create_app
+app = create_app()
 
-    app.app_context().push()
+@app.before_first_request
+def create_blog_owner():
+    # app.app_context().push()
     from personal_blog_api.config import BaseConfig
     from personal_blog_api.models import db
     from personal_blog_api.models import User
@@ -20,4 +21,5 @@ if __name__ == '__main__':
         db.session.add(blog_owner)
         db.session.commit()
 
+if __name__ == '__main__':
     app.run()
