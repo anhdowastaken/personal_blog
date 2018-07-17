@@ -1,5 +1,7 @@
 <template>
-  <a v-on:click.stop.prevent="logout()">logout</a>
+  <li>
+    <a v-on:click.stop.prevent="logout()">logout</a>
+  </li>
 </template>
 
 <script>
