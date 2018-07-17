@@ -58,7 +58,7 @@ python3 appserver.py
 or
 
 ```bash
-gunicorn -b 127.0.0.1:5000 appserver:app
+gunicorn --workers=2 -b 127.0.0.1:5000 appserver:app
 ```
 
 ## 4.2. Frontend ##
