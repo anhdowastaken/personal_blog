@@ -20,10 +20,10 @@ class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String, unique=True, nullable=False)
-    email = db.Column(db.String, unique=True, nullable=False)
-    password = db.Column(db.String, nullable=False)
-    role = db.Column(db.String, default='user')
+    username = db.Column(db.String(64), unique=True, nullable=False)
+    email = db.Column(db.String(128), unique=True, nullable=False)
+    password = db.Column(db.String(256), nullable=False)
+    role = db.Column(db.String(16), default='user')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login_at = db.Column(db.DateTime, default=datetime.utcnow)
     posts = db.relationship('Post', backref='author', lazy='dynamic')
@@ -88,7 +88,7 @@ class Tag(db.Model):
     __tablename__ = 'tags'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String(128))
 
 class Comment(db.Model):
     __tablename__ = 'comments'
@@ -98,8 +98,8 @@ class Comment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_edit_at = db.Column(db.DateTime, default=datetime.utcnow)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
-    author_name = db.Column(db.String, nullable=False)
-    author_email = db.Column(db.String, nullable=False)
+    author_name = db.Column(db.String(64), nullable=False)
+    author_email = db.Column(db.String(128), nullable=False)
     belong_to_post_author = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
