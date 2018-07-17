@@ -39,7 +39,13 @@
                     <span v-if="post.comments.length == 1"><i class="fa fa-comments-o"></i>1 comment</span>
                     <span v-else-if="post.comments.length > 1"><i class="fa fa-comments-o"></i>{{ post.comments.length }} comments</span>
                   </div>
-                  <div class="entry-content" v-html="post.body"></div>
+                  <!-- <div class="entry-content" v-html="post.body"></div> -->
+                  <div class="entry-content">
+                    <quill-editor v-model="post.body"
+                                    v-bind:options="config"
+                                    v-bind:disabled="quillDisabled">
+                    </quill-editor>
+                  </div>
                 </div>
               </article>
               <div class="clear"></div>
@@ -82,18 +88,33 @@ import { submitDeletePost } from '@/api'
 import { isEmpty } from '@/utils'
 import { key_jwt, key_user_data } from '@/common'
 
+// https://github.com/surmon-china/vue-quill-editor
+// require styles
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+import { quillEditor } from 'vue-quill-editor'
+
 export default {
     name: 'Post',
     components: {
         LeftBarSearch,
         LeftBarTags,
         Comment,
-        CommentForm
+        CommentForm,
+        quillEditor
     },
     data () {
         return {
             post: undefined,
-            isHttpRequestCompleted: true
+            isHttpRequestCompleted: true,
+            config: {
+                modules: {
+                    toolbar: false
+                },
+                // readOnly: true
+            },
+            quillDisabled: true
         }
     },
     props: ['post_id'],
@@ -166,12 +187,20 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style>
 .btn-edit-post {
   margin-bottom: 10px;
 }
 
 .btn-delete-post {
   margin-bottom: 30px;
+}
+
+.entry-content {
+    height: auto;
+}
+
+.entry-content .quill-editor .ql-container {
+    border: 0;
 }
 </style>

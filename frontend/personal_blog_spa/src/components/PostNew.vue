@@ -9,7 +9,7 @@
                  placeholder="Title"
                  v-model="header">
 
-          <quill-editor id="newpost-form-editor"
+          <quill-editor id="postnew-editor"
                         v-model="body"
                         v-bind:options="config">
           </quill-editor>
@@ -24,12 +24,12 @@
 
           <div>
             <button class="btn btn-primary"
-                    id="newpost-form-button-submit"
+                    id="postnew-button-submit"
                     v-on:click.stop.prevent="submitNewPost()"
                     v-on:submit.stop.prevent="submitNewPost()"
                     v-bind:disabled="!isHttpRequestCompleted">Submit</button>
             <button class="btn btn-danger"
-                    id="newpost-form-button-discard"
+                    id="postnew-button-discard"
                     v-on:click.stop.prevent="discardNewPost()"
                     v-bind:disabled="!isHttpRequestCompleted">Discard</button>
           </div>
@@ -153,12 +153,12 @@ export default {
     margin-bottom: 20px;
 }
 
-.ql-container {
-    height: 375px;
+#postnew-editor .ql-container {
+    height: 500px;
 }
 
-#newpost-form-button-submit,
-#newpost-form-button-discard {
+#postnew-button-submit,
+#postnew-button-discard {
     margin-top: 20px;
 }
 
