@@ -25,14 +25,10 @@
               <!-- Collect the nav links, forms, and other content for toggling -->
               <div class="collapse navbar-collapse main-menu bs-example-navbar-collapse-1" id="navbar-example">
                 <ul class="nav navbar-nav navbar-right">
-                  <li class="active">
-                    <router-link to="/">Home</router-link>
-                  </li>
-                  <li>
-                    <router-link to="/login"
-                                 v-if="!isAuthenticated">login</router-link>
-                    <button-logout v-else></button-logout>
-                  </li>
+                  <router-link to="/" tag="li" active-class="active" exact><a>Home</a></router-link>
+                  <router-link to="/login" tag="li" active-class="active" exact
+                               v-if="!isAuthenticated"><a>Login</a></router-link>
+                  <button-logout v-else></button-logout>
                 </ul>
               </div>
               <!-- navbar-collapse -->
