@@ -10,7 +10,7 @@
                 <div class="footer-logo">
                   <h2><span>anh</span>DO</h2>
                 </div>
-                <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.</p>
+                <p></p>
                 <div class="footer-icons">
                   <ul>
                     <li>
@@ -23,7 +23,7 @@
                       <a href="#"><i class="fa fa-google"></i></a>
                     </li>
                     <li>
-                      <a href="#"><i class="fa fa-pinterest"></i></a>
+                      <a href="#"><i class="fa fa-instagram"></i></a>
                     </li>
                   </ul>
                 </div>
@@ -35,13 +35,10 @@
             <div class="footer-content">
               <div class="footer-head">
                 <h4>information</h4>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.
-                </p>
+                <p></p>
                 <div class="footer-contacts">
-                  <p><span>Tel:</span> +123 456 789</p>
-                  <p><span>Email:</span> contact@example.com</p>
-                  <p><span>Working Hours:</span> 9am-5pm</p>
+                  <p><span>Tel:</span> +84 975 730 526</p>
+                  <p><span>Email:</span> doducanh2710@gmail.com</p>
                 </div>
               </div>
             </div>

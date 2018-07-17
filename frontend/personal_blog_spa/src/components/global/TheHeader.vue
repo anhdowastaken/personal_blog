@@ -29,15 +29,9 @@
                     <router-link to="/">Home</router-link>
                   </li>
                   <li>
-                    <a class="page-scroll" href="#about">About</a>
-                  </li>
-                  <li>
-                    <a class="page-scroll" href="#contact">Contact</a>
-                  </li>
-                  <li>
                     <router-link to="/login"
                                  v-if="!isAuthenticated">login</router-link>
-                    <logout v-else></logout>
+                    <button-logout v-else></button-logout>
                   </li>
                 </ul>
               </div>
@@ -55,14 +49,12 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import Login from '@/components/Login'
-import Logout from '@/components/Logout'
+import ButtonLogout from '@/components/global/ButtonLogout'
 
 export default {
     name: 'HeaderComponent',
     components: {
-        Login,
-        Logout,
+        ButtonLogout
     },
     data() {
         return {

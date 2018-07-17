@@ -1,5 +1,5 @@
 <template>
-    <a v-on:click.stop.prevent="goBack">back</a>
+  <a v-on:click.stop.prevent="goBack">back</a>
 </template>
 
 <script>

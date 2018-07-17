@@ -1,115 +1,78 @@
 <template>
-    <div>
-        <header-component></header-component>
-        <header-image-component></header-image-component>
-
-        <div class="blog-page area-padding">
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                <div class="page-head-blog">
-                  <div class="single-blog-page" v-if="isAuthenticated">
-                    <button type="button"
-                            class="btn btn-primary btn-block btn-edit-post"
-                            v-on:click.stop.prevent="$router.push({ name: 'EditPost', params: { post_id: post_id}})"
-                            v-bind:disabled="!isHttpRequestCompleted">edit post</button>
+  <div class="blog-page area-padding">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+          <div class="page-head-blog">
+            <div class="single-blog-page" v-if="isAuthenticated">
+              <button type="button"
+                      class="btn btn-primary btn-block btn-edit-post"
+                      v-on:click.stop.prevent="$router.push({ name: 'PostUpdate', params: { post_id: post_id}})"
+                      v-bind:disabled="!isHttpRequestCompleted">edit post</button>
+            </div>
+            <div class="single-blog-page" v-if="isAuthenticated">
+              <button type="button"
+                      class="btn btn-danger btn-block btn-delete-post"
+                      v-on:click.stop.prevent="deletePost()"
+                      v-bind:disabled="!isHttpRequestCompleted">delete post</button>
+            </div>
+            <left-bar-search></left-bar-search>
+            <left-bar-tags></left-bar-tags>
+          </div>
+        </div>
+        <!-- End left sidebar -->
+        <!-- Start single blog -->
+        <div class="col-md-8 col-sm-8 col-xs-12">
+          <div class="row" v-if="post">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <!-- single-blog start -->
+              <article class="blog-post-wrapper">
+                <div class="post-information">
+                  <h2>{{ post.header }}</h2>
+                  <div class="entry-meta">
+                    <span class="author-meta"><i class="fa fa-user"></i>{{ post.author_name }}</span>
+                    <span><i class="fa fa-clock-o"></i>{{ post.last_edit_at }}</span>
+                    <span>
+                      <i class="fa fa-tags"></i>
+                      <a href="#">life</a>
+                    </span>
+                    <span v-if="post.comments.length == 1"><i class="fa fa-comments-o"></i>1 comment</span>
+                    <span v-else-if="post.comments.length > 1"><i class="fa fa-comments-o"></i>{{ post.comments.length }} comments</span>
                   </div>
-                  <div class="single-blog-page" v-if="isAuthenticated">
-                    <button type="button"
-                            class="btn btn-danger btn-block btn-delete-post"
-                            v-on:click.stop.prevent="deletePost()"
-                            v-bind:disabled="!isHttpRequestCompleted">delete post</button>
+                  <div class="entry-content" v-html="post.body"></div>
+                </div>
+              </article>
+              <div class="clear"></div>
+              <div class="single-post-comments">
+                <div class="comments-area" v-if="post.comments.length">
+                  <div class="comments-heading">
+                    <h3 v-if="post.comments.length == 1">1 comment</h3>
+                    <h3 v-else-if="post.comments.length > 1">{{ post.comments.length }} comments</h3>
                   </div>
-                  <div class="single-blog-page">
-                    <!-- search option start -->
-                    <form action="#">
-                      <div class="search-option">
-                        <input type="text" placeholder="Search...">
-                        <button class="button" type="submit">
-                          <i class="fa fa-search"></i>
-                        </button>
-                      </div>
-                    </form>
-                    <!-- search option end -->
-                  </div>
-                  <div class="single-blog-page">
-                    <div class="left-tags blog-tags">
-                      <div class="popular-tag left-side-tags left-blog">
-                        <h4>tags</h4>
-                        <ul>
-                          <li>
-                            <a href="#">life</a>
-                          </li>
-                          <li>
-                            <a href="#">work</a>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
+                  <div class="comments-list">
+                    <ul>
+                      <comment v-for="comment in post.comments" :key="comment.id" v-bind:comment="comment"></comment>
+                    </ul>
                   </div>
                 </div>
+                <comment-form v-bind:post="post"></comment-form>
               </div>
-              <!-- End left sidebar -->
-              <!-- Start single blog -->
-              <div class="col-md-8 col-sm-8 col-xs-12">
-                <div class="row" v-if="post">
-                  <div class="col-md-12 col-sm-12 col-xs-12">
-                    <!-- single-blog start -->
-                    <article class="blog-post-wrapper">
-                      <div class="post-information">
-                        <h2>{{ post.header }}</h2>
-                        <div class="entry-meta">
-                          <span class="author-meta"><i class="fa fa-user"></i>{{ post.author_name }}</span>
-                          <span><i class="fa fa-clock-o"></i>{{ post.last_edit_at }}</span>
-                          <span>
-                            <i class="fa fa-tags"></i>
-                            <a href="#">life</a>
-                          </span>
-                          <span v-if="post.comments.length == 1"><i class="fa fa-comments-o"></i>1 comment</span>
-                          <span v-else-if="post.comments.length > 1"><i class="fa fa-comments-o"></i>{{ post.comments.length }} comments</span>
-                        </div>
-                        <div class="entry-content" v-html="post.body"></div>
-                      </div>
-                    </article>
-                    <div class="clear"></div>
-                    <div class="single-post-comments">
-                      <div class="comments-area" v-if="post.comments.length">
-                        <div class="comments-heading">
-                          <h3 v-if="post.comments.length == 1">1 comment</h3>
-                          <h3 v-else-if="post.comments.length > 1">{{ post.comments.length }} comments</h3>
-                        </div>
-                        <div class="comments-list">
-                          <ul>
-                            <comment v-for="comment in post.comments" :key="comment.id" v-bind:comment="comment"></comment>
-                          </ul>
-                        </div>
-                      </div>
-                      <comment-form v-bind:post="post"></comment-form>
-                    </div>
-                    <!-- single-blog end -->
-                  </div>
-                </div>
-              </div>
+              <!-- single-blog end -->
             </div>
           </div>
         </div>
-        <!-- End Blog Area -->
-
-        <footer-component></footer-component>
-
-        <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
 import { mapState } from 'vuex' 
 import { mapGetters } from 'vuex'
+import { mapMutations } from 'vuex'
 
-import HeaderComponent from '@/components/HeaderComponent'
-import HeaderImageComponent from '@/components/HeaderImageComponent'
-import FooterComponent from '@/components/FooterComponent'
-import Login from '@/components/Login'
-import Logout from '@/components/Logout'
+import LeftBarSearch from '@/components/LeftBarSearch'
+import LeftBarTags from '@/components/LeftBarTags'
 import Comment from '@/components/Comment'
 import CommentForm from '@/components/CommentForm'
 
@@ -122,11 +85,8 @@ import { key_jwt, key_user_data } from '@/common'
 export default {
     name: 'Post',
     components: {
-        HeaderComponent,
-        HeaderImageComponent,
-        FooterComponent,
-        Login,
-        Logout,
+        LeftBarSearch,
+        LeftBarTags,
         Comment,
         CommentForm
     },
@@ -169,6 +129,10 @@ export default {
         ])
     },
     methods: {
+        ...mapMutations([
+            'setNotificationContent',
+            'showNotification'
+        ]),
         deletePost: function() {
             if (confirm('Are you sure?')) {
                 this.isHttpRequestCompleted = false

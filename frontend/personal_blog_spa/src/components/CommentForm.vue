@@ -7,9 +7,14 @@
         <div class="col-lg-12 col-md-12 col-sm-12 comment-form-comment">
           <p>Comment</p>
           <textarea id="message-box" cols="30" rows="10" v-model="content"></textarea>
-          <input type="submit" value="Post Comment"
+          <button class="btn btn-primary"
+                  v-on:click.stop.prevent="postComment()"
+                  v-on:submit.stop.prevent="postComment()"
+                  v-bind:disabled="!isHttpRequestCompleted">Post Comment</button>
+          <!-- <input type="submit" value="Post Comment"
                  v-on:click.stop.prevent="postComment()"
-                 v-on:submit.stop.prevent="postComment()"/>
+                 v-on:submit.stop.prevent="postComment()"
+                 v-bind:disabled="!isHttpRequestCompleted"/> -->
         </div>
       </div>
     </form>
@@ -31,9 +36,14 @@
           <p>Comment *</p>
           <textarea id="message-box" cols="30" rows="10" v-model="content"></textarea>
           <div class="g-recaptcha" :data-sitekey="rcapt_sig_key"></div>
-          <input type="submit" value="Post Comment"
+          <button class="btn btn-primary"
+                  v-on:click.stop.prevent="postComment()"
+                  v-on:submit.stop.prevent="postComment()"
+                  v-bind:disabled="!isHttpRequestCompleted">Post Comment</button>
+          <!-- <input type="submit" value="Post Comment"
                  v-on:click.stop.prevent="postComment()"
-                 v-on:submit.stop.prevent="postComment()"/>
+                 v-on:submit.stop.prevent="postComment()"
+                 v-bind:disabled="!isHttpRequestCompleted"/> -->
         </div>
       </div>
     </form>
@@ -43,6 +53,7 @@
 <script>
 import { mapState } from 'vuex' 
 import { mapGetters } from 'vuex'
+import { mapMutations } from 'vuex'
 
 import { submitComment } from '@/api'
 import { isEmpty } from '@/utils'
@@ -91,6 +102,10 @@ export default {
         ])
     },
     methods: {
+        ...mapMutations([
+            'setNotificationContent',
+            'showNotification'
+        ]),
         initReCaptcha: function () {
             setTimeout(() => {
                 if (typeof grecaptcha === 'undefined' || typeof grecaptcha.render ==='undefined') {
@@ -119,6 +134,7 @@ export default {
                 }
             }
 
+            this.isHttpRequestCompleted = false
             submitComment(this.jwt, this.post.post_id, this.content, this.author_name, this.author_email, recaptcha_response)
                 .then(response => {
                     if (response.status == 201) {
@@ -128,6 +144,22 @@ export default {
 
                         let comment = response.data['comment']
                         this.post.comments.push(comment)
+                    }
+                })
+                .catch(error => {
+                    this.isHttpRequestCompleted = true
+                    if (error.response.data['message']) {
+                        this.setNotificationContent({ header: 'Error',
+                                                      body: error.response.data['message'] })
+                        this.showNotification()
+                    } else if (error) {
+                        this.setNotificationContent({ header: 'Error',
+                                                      body: 'Error Authenticating: ' + error })
+                        this.showNotification()
+                    } else {
+                        this.setNotificationContent({ header: 'Error',
+                                                      body: 'Error' })
+                        this.showNotification()
                     }
                 })
         }

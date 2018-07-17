@@ -1,49 +1,42 @@
 <template>
-    <div>
-        <header-component></header-component>
-        <header-image-component></header-image-component>
+  <div class="blog-page area-padding">
+    <div class="container">
+      <div class="row" v-if="isAuthenticated && post">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <input type="text" autofocus
+                 class="form-control"
+                 id="newpost-form-title"
+                 placeholder="Title"
+                 v-model="post.header">
 
-        <div class="blog-page area-padding">
-          <div class="container">
-            <div class="row" v-if="isAuthenticated">
-              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                <input type="text"
-                       class="form-control"
-                       id="newpost-form-title"
-                       placeholder="Title"
-                       v-model="header">
+          <quill-editor id="newpost-form-editor"
+                        v-model="post.body"
+                        v-bind:options="config">
+          </quill-editor>
 
-                <quill-editor id="newpost-form-editor"
-                              v-model="body"
-                              v-bind:options="config">
-                </quill-editor>
+          <div>
+            <label>Private</label>
+            <label class="switch">
+              <input type="checkbox" v-model="post.private_post">
+              <span class="slider round"></span>
+            </label>
+          </div>
 
-                <div>
-                  <label>Private</label>
-                  <label class="switch">
-                    <input type="checkbox" v-model="private_post">
-                    <span class="slider round"></span>
-                  </label>
-                </div>
-
-                <div>
-                  <button class="btn btn-primary"
-                          id="newpost-form-button-submit"
-                          v-on:click.stop.prevent="submitNewPost()"
-                          v-on:submit.stop.prevent="submitNewPost()"
-                          v-bind:disabled="!isHttpRequestCompleted">Submit</button>
-                  <button class="btn btn-danger"
-                          id="newpost-form-button-discard"
-                          v-on:click.stop.prevent="discardNewPost()"
-                          v-bind:disabled="!isHttpRequestCompleted">Discard</button>
-                </div>
-              </div>
-            </div>
+          <div>
+            <button class="btn btn-primary"
+                    id="newpost-form-button-submit"
+                    v-on:click.stop.prevent="updatePost()"
+                    v-on:submit.stop.prevent="updatePost()"
+                    v-bind:disabled="!isHttpRequestCompleted">Submit</button>
+            <button class="btn btn-danger"
+                    id="newpost-form-button-discard"
+                    v-on:click.stop.prevent="discardUpdatePost()"
+                    v-bind:disabled="!isHttpRequestCompleted">Discard</button>
           </div>
         </div>
-
-        <footer-component></footer-component>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -51,14 +44,8 @@ import { mapState } from 'vuex'
 import { mapGetters } from 'vuex'
 import { mapMutations } from 'vuex'
 
-import HeaderComponent from '@/components/HeaderComponent'
-import HeaderImageComponent from '@/components/HeaderImageComponent'
-import FooterComponent from '@/components/FooterComponent'
-import Login from '@/components/Login'
-import Logout from '@/components/Logout'
-import Back from '@/components/Back'
-
-import { createNewPost } from '@/api'
+import { fetchPost } from '@/api'
+import { submitUpdatePost } from '@/api'
 import { key_jwt, key_user_data } from '@/common'
 
 // https://github.com/surmon-china/vue-quill-editor
@@ -69,20 +56,14 @@ import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
 
 export default {
-    name: 'NewPost',
+    name: 'EditPost',
     components: {
-        HeaderComponent,
-        HeaderImageComponent,
-        FooterComponent,
-        Login,
-        Logout,
         quillEditor
     },
+    props: ['post_id'],
     data () {
         return {
-            header: '',
-            body: '',
-            private_post: true,
+            post: undefined,
             config: {
                 modules: {
                     toolbar: {
@@ -105,6 +86,16 @@ export default {
             isHttpRequestCompleted: true
         }
     },
+    beforeMount() {
+        this.$nextTick(() => {
+            fetchPost(this.jwt, this.post_id)
+                .then(response => {
+                    if (response.status === 200) {
+                        this.post = response.data
+                    }
+                })
+        })
+    },
     computed: {
         ...mapState({
             jwt: function(state) {
@@ -125,17 +116,17 @@ export default {
             'setNotificationContent',
             'showNotification'
         ]),
-        submitNewPost: function() {
-            if (this.header == '') {
+        updatePost: function() {
+            if (this.post.header == '') {
                 this.setNotificationContent({ header: 'Error',
                                               body: 'Title can\'t be empty' })
                 this.showNotification()
             } else {
                 this.isHttpRequestCompleted = false
-                createNewPost(this.jwt, this.header, this.body, this.private_post)
+                submitUpdatePost(this.jwt, this.post.post_id, this.post.header, this.post.body, this.post.private_post)
                     .then(response => {
                         this.isHttpRequestCompleted = true
-                        if (response.status === 201) {
+                        if (response.status === 200) {
                             this.$router.push({ name: "Home" })
                         }
                     })
@@ -157,7 +148,7 @@ export default {
                     })
             }
         },
-        discardNewPost: function() {
+        discardUpdatePost: function() {
             if (confirm('Are you sure?')) {
                 this.$router.push('/')
             }

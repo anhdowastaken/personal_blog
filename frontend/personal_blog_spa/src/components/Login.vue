@@ -1,17 +1,23 @@
 <template>
-    <div>
-        <form class="form-signin">
+  <div class="blog-page area-padding">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-12">
+          <form class="form-signin">
             <h2 class="form-signin-heading"></h2>
             <label for="inputUsername" class="sr-only">Username</label>
             <input type="username" id="inputUsername" class="form-control" placeholder="username" required autofocus v-model="username">
             <label for="inputPassword" class="sr-only">Password</label>
             <input type="password" id="inputPassword" class="form-control" placeholder="password" required v-model="password">
-            <button class="btn btn-lg btn-primary btn-block"
+            <button class="btn btn-primary btn-block"
                     v-on:click.stop.prevent="login()"
                     v-on:submit.stop.prevent="login()"
                     v-bind:disabled="!isHttpRequestCompleted">Login</button>
-        </form>
+          </form> 
+        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>

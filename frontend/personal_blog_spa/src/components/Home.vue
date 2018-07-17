@@ -1,100 +1,62 @@
 <template>
-    <div>
-        <header-component></header-component>
-        <header-image-component></header-image-component>
-
-        <div class="blog-page area-padding">
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                <div class="page-head-blog">
-                  <div class="single-blog-page" v-if="isAuthenticated">
-                    <button type="button"
-                            class="btn btn-primary btn-block btn-new-post"
-                            v-on:click.stop.prevent="$router.push('/new_post')">new post</button>
-                  </div>
-                  <div class="single-blog-page">
-                    <!-- search option start -->
-                    <form action="#">
-                      <div class="search-option">
-                        <input type="text" placeholder="Search...">
-                        <button class="button" type="submit">
-                                                  <i class="fa fa-search"></i>
-                                              </button>
-                      </div>
-                    </form>
-                    <!-- search option end -->
-                  </div>
-                  <div class="single-blog-page">
-                    <div class="left-tags blog-tags">
-                      <div class="popular-tag left-side-tags left-blog">
-                        <h4>tags</h4>
-                        <ul>
-                          <li>
-                            <a href="#">life</a>
-                          </li>
-                          <li>
-                            <a href="#">work</a>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
+  <div class="blog-page area-padding">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+          <div class="page-head-blog">
+            <div class="single-blog-page" v-if="isAuthenticated">
+              <button type="button"
+                      class="btn btn-primary btn-block btn-new-post"
+                      v-on:click.stop.prevent="$router.push('/post_new')">Compose New Post</button>
+            </div>
+            <left-bar-search></left-bar-search>
+            <left-bar-tags></left-bar-tags>
+          </div>
+        </div>
+        <!-- End left sidebar -->
+        <!-- Start single blog -->
+        <div class="col-md-8 col-sm-8 col-xs-12">
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12"
+                 v-for="post in posts" :key="post.id">
+              <div class="single-blog">
+                <div class="blog-meta">
+                  <span class="date-type">
+                    <i class="fa fa-calendar"></i>{{ post.last_edit_at }}
+                  </span>
+                  <span class="comments-type"
+                        v-if="post.comments.length == 1">
+                    <i class="fa fa-comment-o"></i> 1 comment
+                  </span>
+                  <span class="comments-type"
+                        v-else-if="post.comments.length > 1">
+                    <i class="fa fa-comment-o"></i> {{ post.comments.length }} comments
+                  </span>
+                  <span v-if="isAuthenticated && post.private_post"
+                        class="label label-default">Private</span>
                 </div>
-              </div>
-              <!-- End left sidebar -->
-              <!-- Start single blog -->
-              <div class="col-md-8 col-sm-8 col-xs-12">
-                <div class="row">
-                  <div class="col-md-12 col-sm-12 col-xs-12"
-                       v-for="post in posts" :key="post.id">
-                    <div class="single-blog">
-                      <div class="blog-meta">
-                        <span class="date-type">
-                          <i class="fa fa-calendar"></i>{{ post.last_edit_at }}
-                        </span>
-                        <span class="comments-type"
-                              v-if="post.comments.length == 1">
-                          <i class="fa fa-comment-o"></i> 1 comment
-                        </span>
-                        <span class="comments-type"
-                              v-else-if="post.comments.length > 1">
-                          <i class="fa fa-comment-o"></i> {{ post.comments.length }} comments
-                        </span>
-                        <span v-if="isAuthenticated && post.private_post"
-                              class="label label-default">Private</span>
-                      </div>
-                      <div class="blog-text">
-                        <router-link :to="{ name: 'Post', params: { post_id: post.post_id }}">
-                            <h4>{{ post.header }}</h4>
-                            <p style="color: gray;">{{ post.preview }}</p>
-                        </router-link>
-                      </div>
-                      <!-- <span>
-                        <a href="blog-details.html" class="ready-btn">Read more</a>
-                      </span> -->
-                    </div>
-                  </div>
-                  <!-- End single blog -->
-                  <div class="blog-pagination">
-                    <ul class="pagination">
-                      <li><a v-if="has_prev"
-                             v-on:click.stop.prevent="fetchPosts(prev_num)">&lt;</a></li>
-                      <li><a v-if="has_next"
-                             v-on:click.stop.prevent="fetchPosts(next_num)">&gt;</a></li>
-                    </ul>
-                  </div>
+                <div class="blog-text">
+                  <router-link :to="{ name: 'Post', params: { post_id: post.post_id }}">
+                      <h4>{{ post.header }}</h4>
+                      <p style="color: gray;">{{ post.preview }}</p>
+                  </router-link>
                 </div>
               </div>
             </div>
+            <!-- End single blog -->
+            <div class="blog-pagination">
+              <ul class="pagination">
+                <li><a v-if="has_prev"
+                       v-on:click.stop.prevent="fetchPosts(prev_num)">&lt;</a></li>
+                <li><a v-if="has_next"
+                       v-on:click.stop.prevent="fetchPosts(next_num)">&gt;</a></li>
+              </ul>
+            </div>
           </div>
         </div>
-        <!-- End Blog Area -->
-
-        <footer-component></footer-component>
-
-        <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -102,13 +64,8 @@ import { mapState } from 'vuex'
 import { mapGetters } from 'vuex'
 import { mapMutations } from 'vuex'
 
-import HeaderComponent from '@/components/HeaderComponent'
-import HeaderImageComponent from '@/components/HeaderImageComponent'
-import FooterComponent from '@/components/FooterComponent'
-import Login from '@/components/Login'
-import Logout from '@/components/Logout'
-import NewPost from '@/components/NewPost'
-import Post from '@/components/Post'
+import LeftBarSearch from '@/components/LeftBarSearch'
+import LeftBarTags from '@/components/LeftBarTags'
 
 import { fetchAllPosts } from '@/api'
 import { fetchPublicPosts } from '@/api'
@@ -117,13 +74,8 @@ import { key_jwt, key_user_data } from '@/common'
 export default {
     name: 'Home',
     components: {
-        HeaderComponent,
-        HeaderImageComponent,
-        FooterComponent,
-        Login,
-        Logout,
-        NewPost,
-        Post
+        LeftBarSearch,
+        LeftBarTags
     },
     data () {
         return {
@@ -158,7 +110,9 @@ export default {
     methods: {
         ...mapMutations([
             'setPosts',
-            'setPageInfo'
+            'setPageInfo',
+            'setNotificationContent',
+            'showNotification'
         ]),
         fetchPosts: function(page) {
             if (this.isAuthenticated) {
@@ -174,6 +128,22 @@ export default {
                                              })
                         }
                     })
+                    .catch(error => {
+                        this.isHttpRequestCompleted = true
+                        if (error.response.data['message']) {
+                            this.setNotificationContent({ header: 'Error',
+                                                          body: error.response.data['message'] })
+                            this.showNotification()
+                        } else if (error) {
+                            this.setNotificationContent({ header: 'Error',
+                                                          body: 'Error Authenticating: ' + error })
+                            this.showNotification()
+                        } else {
+                            this.setNotificationContent({ header: 'Error',
+                                                          body: 'Error' })
+                            this.showNotification()
+                        }
+                    })
             } else {
                 fetchPublicPosts(page)
                     .then(response => {
@@ -185,6 +155,22 @@ export default {
                                                next_num: response.data['next_num'],
                                                prev_num: response.data['prev_num']
                                              })
+                        }
+                    })
+                    .catch(error => {
+                        this.isHttpRequestCompleted = true
+                        if (error.response.data['message']) {
+                            this.setNotificationContent({ header: 'Error',
+                                                          body: error.response.data['message'] })
+                            this.showNotification()
+                        } else if (error) {
+                            this.setNotificationContent({ header: 'Error',
+                                                          body: 'Error Authenticating: ' + error })
+                            this.showNotification()
+                        } else {
+                            this.setNotificationContent({ header: 'Error',
+                                                          body: 'Error' })
+                            this.showNotification()
                         }
                     })
             }
