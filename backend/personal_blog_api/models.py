@@ -5,6 +5,7 @@ models.py
 
 from datetime import datetime
 from hashlib import md5
+import pytz
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from .application import bcrypt
@@ -79,7 +80,7 @@ class Post(db.Model):
                     header=self.header,
                     preview=preview,
                     body=self.body,
-                    last_edit_at=self.last_edit_at,
+                    last_edit_at=int(self.last_edit_at.replace(tzinfo=pytz.utc).timestamp()),
                     author_name=User.query.filter(User.id == self.author_id).first().username,
                     comments=comments,
                     private_post=self.private_post)
@@ -113,4 +114,4 @@ class Comment(db.Model):
                     content=self.content,
                     author_name=self.author_name,
                     author_avatar=avatar,
-                    created_at=self.created_at)
+                    created_at=int(self.created_at.replace(tzinfo=pytz.utc).timestamp()))

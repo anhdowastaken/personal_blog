@@ -135,7 +135,7 @@ def login():
                                            username=registered_user.username,
                                            email=registered_user.email,
                                            role=registered_user.role,
-                                           last_login_at=int(last_login_at.timestamp())))), 200
+                                           last_login_at=int(last_login_at.replace(tzinfo=pytz.utc).timestamp())))), 200
     else:
         app_logger.info('-> Failed: No session information')
         return jsonify(dict(message='Logged in failed', authenticated=False)), 500

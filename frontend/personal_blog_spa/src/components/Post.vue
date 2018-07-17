@@ -124,6 +124,8 @@ export default {
                 .then(response => {
                     if (response.status === 200) {
                         this.post = response.data
+                        let d = new Date(this.post['last_edit_at'] * 1000)
+                        this.post['last_edit_at'] = d.toLocaleString()
                     }
                 })
         })

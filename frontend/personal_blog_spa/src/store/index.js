@@ -64,6 +64,12 @@ const mutations = {
     // When a mutation is committed any components that are referencing
     // the now reactive data in the state object are updated with the new values, causing the UI to update and re-render its elements.
     setPosts(state, payload) {
+        for (let i = 0; i < payload.posts.length; i++) {
+            let post = payload.posts[i]
+
+            let d = new Date(post['last_edit_at'] * 1000)
+            post['last_edit_at'] = d.toLocaleString()
+        }
         state.posts = payload.posts
     },
     setPageInfo(state, payload) {
@@ -74,7 +80,7 @@ const mutations = {
         state.prev_num = payload.prev_num
     },
     setUserData(state, payload) {
-        console.log('setUserData payload = ', payload)
+        // console.log('setUserData payload = ', payload)
         if (payload.userData['last_login_at']) {
             // Backend returns timestamp in second (UTC)
             let d = new Date()
@@ -85,7 +91,7 @@ const mutations = {
         state.userData = payload.userData
     },
     setJwtToken(state, payload) {
-        console.log('setJwtToken payload = ', payload)
+        // console.log('setJwtToken payload = ', payload)
         localStorage.setItem(key_jwt, payload.jwt)
         state.jwt = payload.jwt
     },
