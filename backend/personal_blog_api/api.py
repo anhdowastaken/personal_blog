@@ -308,7 +308,6 @@ def post_comment():
     content = data['content']
     author_name = data['author_name']
     author_email = data['author_email']
-    recaptcha_response = data['recaptcha_response']
     registered_user = None
 
     post = Post.query.filter(Post.id == post_id).first()
@@ -354,6 +353,11 @@ def post_comment():
             return jsonify(dict(message="Backend error",
                                 created=False)), 401
     else:
+        if not 'recaptcha_response' in data:
+           return jsonify(dict(message="reCaptcha is invalid",
+                               created=False)), 400
+
+        recaptcha_response = data['recaptcha_response']
         if recaptcha_response is None or recaptcha_response == '' or not is_human(recaptcha_response):
            return jsonify(dict(message="reCaptcha is invalid",
                                created=False)), 400
