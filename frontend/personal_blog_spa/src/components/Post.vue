@@ -8,13 +8,13 @@
               <button type="button"
                       class="btn btn-primary btn-block btn-edit-post"
                       v-on:click.stop.prevent="$router.push({ name: 'PostUpdate', params: { post_id: post_id}})"
-                      v-bind:disabled="!isHttpRequestCompleted">edit post</button>
+                      v-bind:disabled="!isHttpRequestCompleted">Update Post</button>
             </div>
             <div class="single-blog-page" v-if="isAuthenticated">
               <button type="button"
                       class="btn btn-danger btn-block btn-delete-post"
                       v-on:click.stop.prevent="deletePost()"
-                      v-bind:disabled="!isHttpRequestCompleted">delete post</button>
+                      v-bind:disabled="!isHttpRequestCompleted">Delete Post</button>
             </div>
             <left-bar-search></left-bar-search>
             <left-bar-tags></left-bar-tags>
