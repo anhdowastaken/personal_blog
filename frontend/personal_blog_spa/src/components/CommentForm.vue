@@ -1,49 +1,28 @@
 <template>
-  <div class="comment-respond"
-       v-if="isAuthenticated">
+  <div class="comment-respond">
     <h3 class="comment-reply-title">Leave a Reply </h3>
+    <span class="email-notes" v-if="!isAuthenticated">Your email address will not be published. Required fields are marked *</span>
     <form action="#">
       <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12 comment-form-comment">
-          <p>Comment</p>
-          <textarea id="message-box" cols="30" rows="10" v-model="content"></textarea>
-          <button class="btn btn-primary"
-                  v-on:click.stop.prevent="postComment()"
-                  v-on:submit.stop.prevent="postComment()"
-                  v-bind:disabled="!isHttpRequestCompleted">Post Comment</button>
-          <!-- <input type="submit" value="Post Comment"
-                 v-on:click.stop.prevent="postComment()"
-                 v-on:submit.stop.prevent="postComment()"
-                 v-bind:disabled="!isHttpRequestCompleted"/> -->
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="comment-respond" v-else>
-    <h3 class="comment-reply-title">Leave a Reply </h3>
-    <span class="email-notes">Your email address will not be published. Required fields are marked *</span>
-    <form action="#">
-      <div class="row">
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"
+             v-if="!isAuthenticated">
           <p>Name *</p>
           <input type="text" v-model="author_name"/>
         </div>
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"
+             v-if="!isAuthenticated">
           <p>Email *</p>
           <input type="email" v-model="author_email"/>
         </div>
-        <div class="col-lg-12 col-md-12 col-sm-12 comment-form-comment">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <p>Comment *</p>
           <textarea id="message-box" cols="30" rows="10" v-model="content"></textarea>
-          <div class="g-recaptcha" :data-sitekey="rcapt_sig_key"></div>
+          <div class="g-recaptcha" :data-sitekey="rcapt_sig_key"
+               v-if="!isAuthenticated"></div>
           <button class="btn btn-primary"
                   v-on:click.stop.prevent="postComment()"
                   v-on:submit.stop.prevent="postComment()"
                   v-bind:disabled="!isHttpRequestCompleted">Post Comment</button>
-          <!-- <input type="submit" value="Post Comment"
-                 v-on:click.stop.prevent="postComment()"
-                 v-on:submit.stop.prevent="postComment()"
-                 v-bind:disabled="!isHttpRequestCompleted"/> -->
         </div>
       </div>
     </form>
