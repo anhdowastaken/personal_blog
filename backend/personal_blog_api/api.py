@@ -20,6 +20,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy.exc import SQLAlchemyError
 import jwt
 from .application import bcrypt
+from .application import app_logger
 from .config import BaseConfig
 from .models import db, User, Post, Comment
 
@@ -53,12 +54,10 @@ def token_required(f):
         except jwt.ExpiredSignatureError:
             return jsonify(expired_msg), 401 # 401 is Unauthorized HTTP status code
         except (jwt.InvalidTokenError) as e:
-            # TODO: Use logger
-            print(e)
+            app_logger.debug(e)
             return jsonify(invalid_msg), 401
         except (Exception) as e:
-            # TODO: Use logger
-            print(e)
+            app_logger.debug(e)
             return jsonify(dict(message="Backend error",
                                 authenticated=False)), 500
 
@@ -95,8 +94,7 @@ def reset_password(jwt_user):
                                                password=password,
                                                role=registered_user.role))), 201
         except (SQLAlchemyError) as e:
-            # TODO: Use logger
-            print(e)
+            app_logger.debug(e)
             return jsonify(dict(message='Reset failed', registered=False)), 500
     else:
         return jsonify(dict(message='User doesn\'t exist', registered=False)), 400
@@ -108,8 +106,11 @@ def login():
     username = data['username']
     password = data['password']
 
+    app_logger.info('{} is trying to login...'.format(username))
+
     registered_user = User.query.filter_by(username=username).first()
     if registered_user is None or bcrypt.check_password_hash(registered_user.password, password) == False:
+        app_logger.info('-> Failed: Username or password is invalid')
         return jsonify(dict(message='Username or password is invalid', authenticated=False)), 401
 
     last_login_at = registered_user.last_login_at
@@ -126,6 +127,7 @@ def login():
             'iat': datetime.utcnow(),
             'exp': datetime.utcnow() + timedelta(hours=24)}, BaseConfig().SECRET_KEY)
 
+        app_logger.info('-> Successfully')
         return jsonify(dict(message='Logged in successfully',
                             authenticated=True,
                             token=token.decode('utf-8'),
@@ -135,6 +137,7 @@ def login():
                                            role=registered_user.role,
                                            last_login_at=int(last_login_at.timestamp())))), 200
     else:
+        app_logger.info('-> Failed: No session information')
         return jsonify(dict(message='Logged in failed', authenticated=False)), 500
 
 @api.route('/logout', methods=['POST'])
@@ -170,7 +173,7 @@ def change_password(jwt_user):
         return jsonify(dict(message='Password is changed successfully',
                             changed=True)), 201
     except (SQLAlchemyError) as e:
-        # TODO: Use logger
+        app_logger.debug(e)
         print(e)
         return jsonify(dict(message='Changed failed', registered=False)), 500
 
@@ -252,8 +255,7 @@ def create_new_post(jwt_user):
         return jsonify(dict(message='New post was created successfully',
                             created=True)), 201
     except (SQLAlchemyError) as e:
-        # TODO: Use logger
-        print(e)
+        app_logger.debug(e)
         return jsonify(dict(message='Create new post failed', created=False)), 500
 
 @api.route('/get_post', methods=['GET'])
@@ -278,13 +280,11 @@ def get_post():
             return jsonify(dict(message="Expired token. Re-authentication required.",
                                 get=False)), 401
         except (jwt.InvalidTokenError) as e:
-            # TODO: Use logger
-            print(e)
+            app_logger.debug(e)
             return jsonify(dict(message="Invalid token. Authentication required",
                                 get=False)), 401
         except (Exception) as e:
-            # TODO: Use logger
-            print(e)
+            app_logger.debug(e)
             return jsonify(dict(message="Backend error",
                                 get=False)), 401
 
@@ -343,13 +343,11 @@ def post_comment():
             return jsonify(dict(message="Expired token. Re-authentication required.",
                                 created=False)), 401
         except (jwt.InvalidTokenError) as e:
-            # TODO: Use logger
-            print(e)
+            app_logger.debug(e)
             return jsonify(dict(message="Invalid token. Authentication required",
                                 created=False)), 401
         except (Exception) as e:
-            # TODO: Use logger
-            print(e)
+            app_logger.debug(e)
             return jsonify(dict(message="Backend error",
                                 created=False)), 401
     else:
@@ -382,8 +380,7 @@ def post_comment():
                             created=True,
                             comment=comment.to_dict())), 201
     except (SQLAlchemyError) as e:
-        # TODO: Use logger
-        print(e)
+        app_logger.debug(e)
         return jsonify(dict(message='Post new comment failed', created=False)), 500
 
 @api.route('/delete_post', methods=['DELETE'])
@@ -418,8 +415,7 @@ def delete_post(jwt_user):
         return jsonify(dict(message='Post was deleted successfully',
                             deleted=True)), 200
     except (SQLAlchemyError) as e:
-        # TODO: Use logger
-        print(e)
+        app_logger.debug(e)
         db.session.rollback()
         return jsonify(dict(message='Delete post failed', deleted=False)), 500
 
@@ -456,8 +452,7 @@ def update_post(jwt_user):
         return jsonify(dict(message='Post was updated successfully',
                             updated=True)), 200
     except (SQLAlchemyError) as e:
-        # TODO: Use logger
-        print(e)
+        app_logger.debug(e)
         return jsonify(dict(message='Update post failed', updated=False)), 500
 
 def is_human(captcha_response):
