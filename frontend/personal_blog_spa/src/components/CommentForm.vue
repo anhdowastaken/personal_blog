@@ -116,12 +116,15 @@ export default {
             this.isHttpRequestCompleted = false
             submitComment(this.jwt, this.post.post_id, this.content, this.author_name, this.author_email, recaptcha_response)
                 .then(response => {
+                    this.isHttpRequestCompleted = true
                     if (response.status == 201) {
                         this.author_name = ''
                         this.author_email = ''
                         this.content = ''
 
                         let comment = response.data['comment']
+                        let d = new Date(comment['created_at'] * 1000)
+                        comment['created_at'] = d.toLocaleString()
                         this.post.comments.push(comment)
                     }
                 })

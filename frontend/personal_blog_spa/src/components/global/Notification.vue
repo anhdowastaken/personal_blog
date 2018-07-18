@@ -45,5 +45,8 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+.modal {
+  z-index: 999999;
+}
 </style>

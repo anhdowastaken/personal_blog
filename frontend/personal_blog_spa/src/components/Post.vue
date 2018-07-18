@@ -57,7 +57,9 @@
                   </div>
                   <div class="comments-list">
                     <ul>
-                      <comment v-for="comment in post.comments" :key="comment.id" v-bind:comment="comment"></comment>
+                      <comment v-for="(comment, index) in post.comments" :key="comment.id"
+                               v-bind:comment="comment"
+                               v-on:deleteComment="deleteThisComment(index)"></comment>
                     </ul>
                   </div>
                 </div>
@@ -126,6 +128,12 @@ export default {
                         this.post = response.data
                         let d = new Date(this.post['last_edit_at'] * 1000)
                         this.post['last_edit_at'] = d.toLocaleString()
+
+                        for (let i = 0; i < this.post.comments.length; i++) {
+                            let comment = this.post.comments[i]
+                            let d = new Date(comment['created_at'] * 1000)
+                            comment['created_at'] = d.toLocaleString()
+                        }
                     }
                 })
         })
@@ -183,6 +191,9 @@ export default {
                         }
                     })
             }
+        },
+        deleteThisComment: function(index) {
+            this.post.comments.splice(index, 1);
         }
     }
 }

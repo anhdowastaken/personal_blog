@@ -465,3 +465,34 @@ def is_human(captcha_response):
     response_text = json.loads(response.text)
 
     return response_text['success']
+
+@api.route('/delete_comment', methods=['DELETE'])
+@token_required
+@login_required
+def delete_comment(jwt_user):
+    if jwt_user.id != current_user.id:
+        return jsonify(dict(message='Re-authentication required', deleted=False)), 401
+
+    registered_user = User.query.filter_by(id=jwt_user.id).first()
+    if registered_user is None:
+        return jsonify(dict(message='Permission denied', deleted=False)), 401
+
+    data = request.get_json()
+    comment_id = data['comment_id']
+
+    comment = Comment.query.filter(Comment.id == comment_id).first()
+    if comment is None:
+        return jsonify(dict(message="Comment doesn't exist",
+                            deleted=False)), 404
+
+    db.session.delete(comment)
+    try:
+        db.session.commit()
+
+        return jsonify(dict(message='Comment was deleted successfully',
+                            deleted=True)), 200
+    except (SQLAlchemyError) as e:
+        app_logger.debug(e)
+        db.session.rollback()
+        return jsonify(dict(message='Delete comment failed', deleted=False)), 500
+

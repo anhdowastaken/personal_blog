@@ -11,7 +11,7 @@ from flask_bcrypt import Bcrypt
 from .config import BaseConfig
 
 # Configure logger
-formater = logging.Formatter('[%(asctime)s][%(filename)10s:%(lineno)5s] %(levelname)8s --- %(message)s')
+formater = logging.Formatter('[%(asctime)s][%(filename)s:%(lineno)s] %(levelname)s --- %(message)s')
 app_logger = logging.getLogger(__name__)
 handler = logging.FileHandler(BaseConfig().APP_LOG_PATH, mode='a')
 handler.setFormatter(formater)

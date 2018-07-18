@@ -79,7 +79,7 @@ export default {
     },
     data () {
         return {
-            isHttpRequestCompleted: true
+
         }
     },
     beforeMount() {
@@ -130,7 +130,6 @@ export default {
                           }
                       })
                       .catch(error => {
-                          this.isHttpRequestCompleted = true
                           if (error.response.data['message']) {
                               this.setNotificationContent({ header: 'Error',
                                                             body: error.response.data['message'] })
@@ -159,7 +158,6 @@ export default {
                           }
                       })
                       .catch(error => {
-                          this.isHttpRequestCompleted = true
                           if (error.response.data['message']) {
                               this.setNotificationContent({ header: 'Error',
                                                             body: error.response.data['message'] })
