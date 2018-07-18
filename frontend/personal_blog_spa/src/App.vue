@@ -2,6 +2,7 @@
   <div id="app">
     <notification></notification>
 
+    <!-- <preloader></preloader> -->
     <the-header></the-header>
     <the-header-image></the-header-image>
 
@@ -14,6 +15,7 @@
 
 <script>
 import Notification from '@/components/global/Notification'
+// import Preloader from '@/components/global/Preloader'
 import TheHeader from '@/components/global/TheHeader'
 import TheHeaderImage from '@/components/global/TheHeaderImage'
 import TheFooter from '@/components/global/TheFooter'
@@ -23,11 +25,27 @@ export default {
   name: 'App',
   components: {
     Notification,
+    // Preloader,
     TheHeader,
     TheHeaderImage,
     TheFooter,
     ButtonGoToTop
   },
+  mounted() {
+    // Stick menu on top
+    var s = $("#sticker");
+    var pos = s.position();
+    $(window).on('scroll', function() {
+      var windowpos = $(window).scrollTop() > 100;
+      if (windowpos > pos.top) {
+        s.addClass("stick");
+      } else {
+        s.removeClass("stick");
+      }
+    });
+
+    new WOW().init();
+  }
 }
 </script>
 
