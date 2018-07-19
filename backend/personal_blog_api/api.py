@@ -197,7 +197,7 @@ def get_all_posts(jwt_user):
 
     json_all_posts = []
     for p in all_posts.items:
-        json_all_posts.append(p.to_dict())
+        json_all_posts.append(p.to_dict_simple())
 
     return jsonify(dict(posts=json_all_posts,
                         has_next=all_posts.has_next,
@@ -213,7 +213,7 @@ def get_public_posts():
 
     json_all_posts = []
     for p in all_posts.items:
-        json_all_posts.append(p.to_dict())
+        json_all_posts.append(p.to_dict_simple())
 
     return jsonify(dict(posts=json_all_posts,
                         has_next=all_posts.has_next,

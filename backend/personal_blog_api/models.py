@@ -67,6 +67,19 @@ class Post(db.Model):
         for c in self.comments:
             comments.append(c.to_dict())
 
+        return dict(post_id=self.id,
+                    header=self.header,
+                    body=self.body,
+                    last_edit_at=int(self.last_edit_at.replace(tzinfo=pytz.utc).timestamp()),
+                    author_name=User.query.filter(User.id == self.author_id).first().username,
+                    comments=comments,
+                    private_post=self.private_post)
+
+    def to_dict_simple(self):
+        comments = []
+        for c in self.comments:
+            comments.append(c.to_dict())
+
         import re
         html_tags = re.compile('<.*?>')
         clean_body = re.sub(html_tags, '', self.body)
@@ -78,11 +91,10 @@ class Post(db.Model):
 
         return dict(post_id=self.id,
                     header=self.header,
-                    preview=preview,
                     body=self.body,
                     last_edit_at=int(self.last_edit_at.replace(tzinfo=pytz.utc).timestamp()),
                     author_name=User.query.filter(User.id == self.author_id).first().username,
-                    comments=comments,
+                    comments=len(comments),
                     private_post=self.private_post)
 
 class Tag(db.Model):

@@ -25,12 +25,12 @@
                     <i class="fa fa-calendar"></i>{{ post.last_edit_at }}
                   </span>
                   <span class="comments-type"
-                        v-if="post.comments.length == 1">
+                        v-if="post.comments == 1">
                     <i class="fa fa-comment-o"></i> 1 comment
                   </span>
                   <span class="comments-type"
-                        v-else-if="post.comments.length > 1">
-                    <i class="fa fa-comment-o"></i> {{ post.comments.length }} comments
+                        v-else-if="post.comments > 1">
+                    <i class="fa fa-comment-o"></i> {{ post.comments }} comments
                   </span>
                   <span v-if="isAuthenticated && post.private_post"
                         class="label label-default">Private</span>

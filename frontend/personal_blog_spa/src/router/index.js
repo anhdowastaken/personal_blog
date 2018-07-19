@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from '@/store/index.js'
 import Home from '@/components/Home'
 import Login from '@/components/Login'
 import ChangePassword from '@/components/ChangePassword'
@@ -19,12 +20,26 @@ export default new Router({
     {
       path: '/login',
       name: 'Login',
-      component: Login
+      component: Login,
+      beforeEnter(to, from, next) {
+        if (!store.getters.isAuthenticated) {
+          next()
+        } else {
+          next('/')
+        }
+      }
     },
     {
       path: '/change_password',
       name: 'ChangePassword',
-      component: ChangePassword
+      component: ChangePassword,
+      beforeEnter(to, from, next) {
+        if (store.getters.isAuthenticated) {
+          next()
+        } else {
+          next('/')
+        }
+      }
     },
     {
       path: '/post/:post_id',
@@ -35,13 +50,27 @@ export default new Router({
     {
       path: '/post_new',
       name: 'PostNew',
-      component: PostNew
+      component: PostNew,
+      beforeEnter(to, from, next) {
+        if (store.getters.isAuthenticated) {
+          next()
+        } else {
+          next('/')
+        }
+      }
     },
     {
       path: '/post_update/:post_id',
       name: 'PostUpdate',
       component: PostUpdate,
-      props: true
+      props: true,
+      beforeEnter(to, from, next) {
+        if (store.getters.isAuthenticated) {
+          next()
+        } else {
+          next('/')
+        }
+      }
     }
   ]
 })
