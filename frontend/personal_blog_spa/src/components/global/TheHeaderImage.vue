@@ -7,10 +7,10 @@
           <div class="slider-content text-center">
             <div class="header-bottom">
               <div class="layer2 wow zoomIn" data-wow-duration="1s" data-wow-delay=".4s">
-                <h1 class="title2">a simple guy</h1>
+                <h1 class="title2">{{ title2 }}</h1>
               </div>
               <div class="layer3 wow zoomInUp" data-wow-duration="2s" data-wow-delay="1s">
-                <h2 class="title3">with complicated feelings</h2>
+                <h2 class="title3">{{ title3 }}</h2>
               </div>
             </div>
           </div>
@@ -21,11 +21,14 @@
 </template>
 
 <script>
+import { title2, title3 } from '@/common'
+
 export default {
     name: 'HeaderImageComponent',
     data() {
         return {
-
+            title2: title2,
+            title3: title3
         }
     }
 }

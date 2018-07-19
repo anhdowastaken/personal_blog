@@ -19,7 +19,7 @@
                 <!-- Brand -->
                 <router-link to="/"
                              class="navbar-brand page-scroll sticky-logo">
-                  <h1><span>anh</span>DO</h1>
+                  <h1><span>{{ first_name }}</span>{{ last_name}}</h1>
                 </router-link>
               </div>
               <!-- Collect the nav links, forms, and other content for toggling -->
@@ -53,6 +53,9 @@ import { mapGetters } from 'vuex'
 
 import ButtonLogout from '@/components/global/ButtonLogout'
 
+import { first_name,
+         last_name } from '@/common'
+
 export default {
     name: 'HeaderComponent',
     components: {
@@ -60,7 +63,8 @@ export default {
     },
     data() {
         return {
-
+            first_name: first_name,
+            last_name: last_name
         }
     },
     computed: {

@@ -4,61 +4,37 @@
     <div class="footer-area">
       <div class="container">
         <div class="row">
-          <div class="col-md-4 col-sm-4 col-xs-12">
+          <div class="col-md-6 col-sm-6 col-xs-12">
             <div class="footer-content">
               <div class="footer-head">
                 <div class="footer-logo">
-                  <h2><span>anh</span>DO</h2>
+                  <h2><span>{{ first_name }}</span>{{ last_name }}</h2>
                 </div>
                 <p></p>
                 <div class="footer-icons">
                   <ul>
-                    <li>
-                      <a href="#"><i class="fa fa-facebook"></i></a>
-                    </li>
-                    <li>
-                      <a href="#"><i class="fa fa-twitter"></i></a>
-                    </li>
-                    <li>
-                      <a href="#"><i class="fa fa-google"></i></a>
-                    </li>
-                    <li>
-                      <a href="#"><i class="fa fa-instagram"></i></a>
-                    </li>
+                    <li><a target="_blank" :href="'//' + facebook_link"><i class="fa fa-facebook"></i></a></li>
+                    <li><a target="_blank" :href="'//' + twitter_link"><i class="fa fa-twitter"></i></a></li>
+                    <li><a target="_blank" :href="'//' + instagram_link"><i class="fa fa-instagram"></i></a></li>
                   </ul>
                 </div>
               </div>
             </div>
           </div>
           <!-- end single footer -->
-          <div class="col-md-4 col-sm-4 col-xs-12">
+          <div class="col-md-6 col-sm-6 col-xs-12">
             <div class="footer-content">
               <div class="footer-head">
                 <h4>information</h4>
                 <p></p>
                 <div class="footer-contacts">
-                  <p><span>Tel:</span> +84 975 730 526</p>
-                  <p><span>Email:</span> doducanh2710@gmail.com</p>
+                  <p><span>Tel: </span>{{ phone_number }}</p>
+                  <p><span>Email: </span><a :href="'mailto:' + email_address">{{ email_address }}</a></p>
                 </div>
               </div>
             </div>
           </div>
           <!-- end single footer -->
-          <div class="col-md-4 col-sm-4 col-xs-12">
-            <div class="footer-content">
-              <div class="footer-head">
-                <h4>Instagram</h4>
-                <div class="flicker-img">
-                  <a href="#"><img src="/static/img/portfolio/1.jpg" alt=""></a>
-                  <a href="#"><img src="/static/img/portfolio/2.jpg" alt=""></a>
-                  <a href="#"><img src="/static/img/portfolio/3.jpg" alt=""></a>
-                  <a href="#"><img src="/static/img/portfolio/4.jpg" alt=""></a>
-                  <a href="#"><img src="/static/img/portfolio/5.jpg" alt=""></a>
-                  <a href="#"><img src="/static/img/portfolio/6.jpg" alt=""></a>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -88,6 +64,14 @@
 </template>
 
 <script>
+import { facebook_link,
+         twitter_link,
+         instagram_link,
+         first_name,
+         last_name,
+         phone_number,
+         email_address } from '@/common'
+
 export default {
     name: 'FooterComponent',
     components: {
@@ -95,7 +79,13 @@ export default {
     },
     data() {
         return {
-
+            first_name: first_name,
+            last_name: last_name,
+            phone_number: phone_number,
+            email_address: email_address,
+            facebook_link: facebook_link,
+            twitter_link: twitter_link,
+            instagram_link: instagram_link
         }
     },
     computed: {
