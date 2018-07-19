@@ -147,7 +147,7 @@ def logout():
 
     return jsonify(dict(message='Logged out successfully')), 200
 
-@api.route('/change_password', methods=['POST'])
+@api.route('/change_password', methods=['PUT'])
 @token_required
 @login_required
 def change_password(jwt_user):
@@ -158,12 +158,15 @@ def change_password(jwt_user):
     old_password = data['old_password']
     new_password = data['new_password']
 
-    registered_user = User.query.filter_by(id=jwt_user.id).first()
-    if registered_user is None or bcrypt.check_password_hash(registered_user.password, old_password) == False:
-        return jsonify(dict(message='Old password is incorrect', changed=False)), 400
+    if old_password == '':
+        return jsonify(dict(message='Old password can\'t be empty', changed=False)), 400
 
     if new_password == '':
         return jsonify(dict(message='New password can\'t be empty', changed=False)), 400
+
+    registered_user = User.query.filter_by(id=jwt_user.id).first()
+    if registered_user is None or bcrypt.check_password_hash(registered_user.password, old_password) == False:
+        return jsonify(dict(message='Old password is incorrect', changed=False)), 400
 
     password_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
     registered_user.password = password_hash
@@ -171,7 +174,7 @@ def change_password(jwt_user):
         db.session.commit()
 
         return jsonify(dict(message='Password is changed successfully',
-                            changed=True)), 201
+                            changed=True)), 200
     except (SQLAlchemyError) as e:
         app_logger.debug(e)
         print(e)

@@ -35,7 +35,7 @@ export function submitResetPassword(jwt, username) {
 
 export function submitChangePassword(jwt, old_password, new_password) {
     return axios.create({ withCredentials: true })
-                .post(`${API_URL}/change_password`,
+                .put(`${API_URL}/change_password`,
                       { old_password: old_password, new_password: new_password },
                       { headers: { Authorization: `Bearer: ${jwt}` } })
 }

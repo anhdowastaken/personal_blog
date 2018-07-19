@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/Home'
 import Login from '@/components/Login'
+import ChangePassword from '@/components/ChangePassword'
 import Post from '@/components/Post'
 import PostNew from '@/components/PostNew'
 import PostUpdate from '@/components/PostUpdate'
@@ -21,6 +22,11 @@ export default new Router({
       component: Login
     },
     {
+      path: '/change_password',
+      name: 'ChangePassword',
+      component: ChangePassword
+    },
+    {
       path: '/post/:post_id',
       name: 'Post',
       component: Post,
@@ -29,8 +35,7 @@ export default new Router({
     {
       path: '/post_new',
       name: 'PostNew',
-      component: PostNew,
-      props: true
+      component: PostNew
     },
     {
       path: '/post_update/:post_id',
