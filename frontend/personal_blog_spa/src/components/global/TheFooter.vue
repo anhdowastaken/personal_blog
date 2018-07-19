@@ -16,6 +16,7 @@
                     <li><a target="_blank" :href="'//' + facebook_link"><i class="fa fa-facebook"></i></a></li>
                     <li><a target="_blank" :href="'//' + twitter_link"><i class="fa fa-twitter"></i></a></li>
                     <li><a target="_blank" :href="'//' + instagram_link"><i class="fa fa-instagram"></i></a></li>
+                    <li><a target="_blank" :href="'//' + github_link"><i class="fa fa-github"></i></a></li>
                   </ul>
                 </div>
               </div>
@@ -67,6 +68,7 @@
 import { facebook_link,
          twitter_link,
          instagram_link,
+         github_link,
          first_name,
          last_name,
          phone_number,
@@ -85,7 +87,8 @@ export default {
             email_address: email_address,
             facebook_link: facebook_link,
             twitter_link: twitter_link,
-            instagram_link: instagram_link
+            instagram_link: instagram_link,
+            github_link: github_link 
         }
     },
     computed: {

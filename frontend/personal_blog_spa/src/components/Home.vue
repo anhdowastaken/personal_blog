@@ -9,6 +9,7 @@
                       class="btn btn-primary btn-block btn-new-post"
                       v-on:click.stop.prevent="$router.push('/post_new')">Compose New Post</button>
             </div>
+            <left-bar-profile></left-bar-profile>
             <left-bar-search></left-bar-search>
             <left-bar-tags></left-bar-tags>
           </div>
@@ -64,6 +65,7 @@ import { mapState } from 'vuex'
 import { mapGetters } from 'vuex'
 import { mapMutations } from 'vuex'
 
+import LeftBarProfile from '@/components/LeftBarProfile'
 import LeftBarSearch from '@/components/LeftBarSearch'
 import LeftBarTags from '@/components/LeftBarTags'
 
@@ -75,7 +77,8 @@ export default {
     name: 'Home',
     components: {
         LeftBarSearch,
-        LeftBarTags
+        LeftBarTags,
+        LeftBarProfile
     },
     data () {
         return {

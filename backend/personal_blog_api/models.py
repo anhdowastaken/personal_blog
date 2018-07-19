@@ -41,7 +41,7 @@ class User(db.Model, UserMixin):
         return dict(user_id=self.id,
                     email=self.email,
                     username=self.username,
-                    last_login_at=self.last_login_at)
+                    last_login_at=int(self.last_login_at.replace(tzinfo=pytz.utc).timestamp()))
 
 class Post(db.Model):
     __tablename__ = 'posts'

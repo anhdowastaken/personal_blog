@@ -131,11 +131,7 @@ def login():
         return jsonify(dict(message='Logged in successfully',
                             authenticated=True,
                             token=token.decode('utf-8'),
-                            user_data=dict(user_id=registered_user.id,
-                                           username=registered_user.username,
-                                           email=registered_user.email,
-                                           role=registered_user.role,
-                                           last_login_at=int(last_login_at.replace(tzinfo=pytz.utc).timestamp())))), 200
+                            user_data=registered_user.to_dict())), 200
     else:
         app_logger.info('-> Failed: No session information')
         return jsonify(dict(message='Logged in failed', authenticated=False)), 500
