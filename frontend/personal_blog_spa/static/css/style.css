@@ -2088,7 +2088,7 @@ div#preloader {
 .post-information h2 {
   color: #363636;
   font-size: 22px;
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
 }
 
 .post-information {
