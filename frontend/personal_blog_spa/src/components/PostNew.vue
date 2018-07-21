@@ -14,6 +14,10 @@
                         v-bind:options="config">
           </quill-editor>
 
+          <input-tag id="postnew-tag"
+                     placeholder="Add tag here..."
+                     :tags.sync="tags"></input-tag>
+
           <div>
             <label>Private</label>
             <label class="switch">
@@ -44,6 +48,8 @@ import { mapState } from 'vuex'
 import { mapGetters } from 'vuex'
 import { mapMutations } from 'vuex'
 
+import InputTag from 'vue-input-tag'
+
 import { createNewPost } from '@/api'
 import { key_jwt, key_user_data } from '@/common'
 
@@ -57,12 +63,14 @@ import { quillEditor } from 'vue-quill-editor'
 export default {
     name: 'NewPost',
     components: {
-        quillEditor
+        quillEditor,
+        InputTag
     },
     data () {
         return {
             header: '',
             body: '',
+            tags: [],
             private_post: true,
             config: {
                 modules: {
@@ -110,7 +118,7 @@ export default {
                 this.showNotification()
             } else {
                 this.isHttpRequestCompleted = false
-                createNewPost(this.jwt, this.header, this.body, this.private_post)
+                createNewPost(this.jwt, this.header, this.body, this.tags, this.private_post)
                     .then(response => {
                         this.isHttpRequestCompleted = true
                         if (response.status === 201) {
@@ -154,8 +162,23 @@ export default {
     margin-bottom: 20px;
 }
 
+#postnew-editor {
+    margin-bottom: 10px;
+}
+
+#postnew-editor .ql-toolbar {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
 #postnew-editor .ql-container {
     height: 500px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+#postnew-tag {
+    border-radius: 4px;
 }
 
 #postnew-button-submit,

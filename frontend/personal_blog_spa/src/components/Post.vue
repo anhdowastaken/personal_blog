@@ -46,6 +46,9 @@
                                     v-bind:options="config"
                                     v-bind:disabled="quillDisabled">
                     </quill-editor>
+                    <input-tag v-if="post.tags.length > 0"
+                               :read-only="true"
+                               :tags.sync="post.tags"></input-tag>
                   </div>
                 </div>
               </article>
@@ -85,6 +88,7 @@ import LeftBarSearch from '@/components/LeftBarSearch'
 import LeftBarTags from '@/components/LeftBarTags'
 import Comment from '@/components/Comment'
 import CommentForm from '@/components/CommentForm'
+import InputTag from 'vue-input-tag'
 
 import { fetchPost } from '@/api'
 import { submitComment } from '@/api'
@@ -107,7 +111,8 @@ export default {
         LeftBarProfile,
         Comment,
         CommentForm,
-        quillEditor
+        quillEditor,
+        InputTag
     },
     data () {
         return {
@@ -222,5 +227,9 @@ export default {
 
 .entry-content .quill-editor .ql-container {
     border: 0;
+}
+
+.entry-content .vue-input-tag-wrapper {
+    border: none;
 }
 </style>

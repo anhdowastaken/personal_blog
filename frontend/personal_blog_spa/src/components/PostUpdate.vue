@@ -14,6 +14,10 @@
                         v-bind:options="config">
           </quill-editor>
 
+          <input-tag id="postupdate-tag"
+                     placeholder="Add tag here..."
+                     :tags.sync="post.tags"></input-tag>
+
           <div>
             <label>Private</label>
             <label class="switch">
@@ -44,6 +48,8 @@ import { mapState } from 'vuex'
 import { mapGetters } from 'vuex'
 import { mapMutations } from 'vuex'
 
+import InputTag from 'vue-input-tag'
+
 import { fetchPost } from '@/api'
 import { submitUpdatePost } from '@/api'
 import { key_jwt, key_user_data } from '@/common'
@@ -58,7 +64,8 @@ import { quillEditor } from 'vue-quill-editor'
 export default {
     name: 'EditPost',
     components: {
-        quillEditor
+        quillEditor,
+        InputTag
     },
     props: ['post_id'],
     data () {
@@ -120,7 +127,7 @@ export default {
                 this.showNotification()
             } else {
                 this.isHttpRequestCompleted = false
-                submitUpdatePost(this.jwt, this.post.post_id, this.post.header, this.post.body, this.post.private_post)
+                submitUpdatePost(this.jwt, this.post.post_id, this.post.header, this.post.body, this.post.tags, this.post.private_post)
                     .then(response => {
                         this.isHttpRequestCompleted = true
                         if (response.status === 200) {
@@ -164,8 +171,23 @@ export default {
     margin-bottom: 20px;
 }
 
+#postupdate-editor {
+    margin-bottom: 10px;
+}
+
+#postupdate-editor .ql-toolbar {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
 #postupdate-editor .ql-container {
     height: 500px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+#postupdate-tag {
+    border-radius: 4px;
 }
 
 #postupdate-button-submit,

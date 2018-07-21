@@ -67,12 +67,17 @@ class Post(db.Model):
         for c in self.comments:
             comments.append(c.to_dict())
 
+        tags = []
+        for t in self.tags:
+            tags.append(t.name)
+
         return dict(post_id=self.id,
                     header=self.header,
                     body=self.body,
                     last_edit_at=int(self.last_edit_at.replace(tzinfo=pytz.utc).timestamp()),
                     author_name=User.query.filter(User.id == self.author_id).first().username,
                     comments=comments,
+                    tags=tags,
                     private_post=self.private_post)
 
     def to_dict_simple(self):
@@ -101,13 +106,17 @@ class Tag(db.Model):
     __tablename__ = 'tags'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(128))
+    name = db.Column(db.String(128), unique=True, nullable=False)
+
+    def to_dict(self):
+        return dict(tag_id=self.id,
+                    tag_name=self.name)
 
 class Comment(db.Model):
     __tablename__ = 'comments'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    content = db.Column(db.Text)
+    content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_edit_at = db.Column(db.DateTime, default=datetime.utcnow)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))

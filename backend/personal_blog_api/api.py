@@ -22,7 +22,7 @@ import jwt
 from .application import bcrypt
 from .application import app_logger
 from .config import BaseConfig
-from .models import db, User, Post, Comment
+from .models import db, User, Post, Comment, Tag
 
 api = Blueprint('api', __name__)
 
@@ -86,7 +86,6 @@ def reset_password(jwt_user):
         registered_user.password = password_hash
         try:
             db.session.commit()
-
             return jsonify(dict(message='Reset successfully',
                                 registered=True,
                                 user_data=dict(id=registered_user.id,
@@ -95,6 +94,7 @@ def reset_password(jwt_user):
                                                role=registered_user.role))), 201
         except (SQLAlchemyError) as e:
             app_logger.debug(e)
+            db.session.rollback()
             return jsonify(dict(message='Reset failed', registered=False)), 500
     else:
         return jsonify(dict(message='User doesn\'t exist', registered=False)), 400
@@ -115,11 +115,13 @@ def login():
 
     last_login_at = registered_user.last_login_at
     registered_user.last_login_at = datetime.utcnow()
+
+    db.session.add(registered_user)
     try:
-        db.session.add(registered_user)
         db.session.commit()
-    except:
-        pass
+    except (SQLAlchemyError) as e:
+        app_logger.debug(e)
+        db.session.rollback()
 
     if login_user(registered_user):
         token = jwt.encode({
@@ -168,12 +170,11 @@ def change_password(jwt_user):
     registered_user.password = password_hash
     try:
         db.session.commit()
-
         return jsonify(dict(message='Password is changed successfully',
                             changed=True)), 200
     except (SQLAlchemyError) as e:
         app_logger.debug(e)
-        print(e)
+        db.session.rollback()
         return jsonify(dict(message='Changed failed', registered=False)), 500
 
 @api.route('/get_all_posts', methods=['GET'])
@@ -240,21 +241,33 @@ def create_new_post(jwt_user):
     data = request.get_json()
     header = data['header']
     body = data['body']
+    tags = data['tags']
     private_post = data['private_post']
+
+    post_tags = []
+    for t in tags:
+        tag = Tag.query.filter(Tag.name == t).first()
+        if tag is None:
+            tag = Tag()
+            tag.name = t
+            db.session.add(tag)
+        post_tags.append(tag)
 
     post = Post()
     post.header = header
     post.body = body
     post.author_id = jwt_user.id
+    post.tags = post_tags
     post.private_post = private_post
-    try:
-        db.session.add(post)
-        db.session.commit()
+    db.session.add(post)
 
+    try:
+        db.session.commit()
         return jsonify(dict(message='New post was created successfully',
                             created=True)), 201
     except (SQLAlchemyError) as e:
         app_logger.debug(e)
+        db.session.rollback()
         return jsonify(dict(message='Create new post failed', created=False)), 500
 
 @api.route('/get_post', methods=['GET'])
@@ -371,15 +384,15 @@ def post_comment():
         comment.author_email = author_email
         comment.belong_to_post_author = False
 
+    db.session.add(comment)
     try:
-        db.session.add(comment)
         db.session.commit()
-
         return jsonify(dict(message='New comment was posted successfully',
                             created=True,
                             comment=comment.to_dict())), 201
     except (SQLAlchemyError) as e:
         app_logger.debug(e)
+        db.session.rollback()
         return jsonify(dict(message='Post new comment failed', created=False)), 500
 
 @api.route('/delete_post', methods=['DELETE'])
@@ -410,7 +423,6 @@ def delete_post(jwt_user):
     db.session.delete(post)
     try:
         db.session.commit()
-
         return jsonify(dict(message='Post was deleted successfully',
                             deleted=True)), 200
     except (SQLAlchemyError) as e:
@@ -433,6 +445,7 @@ def update_post(jwt_user):
     post_id = data['post_id']
     header = data['header']
     body = data['body']
+    tags = data['tags']
     private_post = data['private_post']
 
     post = Post.query.filter(Post.id == post_id).first()
@@ -440,18 +453,30 @@ def update_post(jwt_user):
         return jsonify(dict(message="Post doesn't exist",
                             updated=False)), 404
 
+    # Add tags to db
+    post_tags = []
+    for t in tags:
+        tag = Tag.query.filter(Tag.name == t).first()
+        if tag is None:
+            tag = Tag()
+            tag.name = t
+            db.session.add(tag)
+        post_tags.append(tag)
+
     post.header = header
     post.body = body
+    post.tags = post_tags
     post.private_post = private_post
     post.last_edit_at = datetime.utcnow()
-    try:
-        db.session.add(post)
-        db.session.commit()
+    db.session.add(post)
 
+    try:
+        db.session.commit()
         return jsonify(dict(message='Post was updated successfully',
                             updated=True)), 200
     except (SQLAlchemyError) as e:
         app_logger.debug(e)
+        db.session.rollback()
         return jsonify(dict(message='Update post failed', updated=False)), 500
 
 def is_human(captcha_response):
@@ -487,7 +512,6 @@ def delete_comment(jwt_user):
     db.session.delete(comment)
     try:
         db.session.commit()
-
         return jsonify(dict(message='Comment was deleted successfully',
                             deleted=True)), 200
     except (SQLAlchemyError) as e:
