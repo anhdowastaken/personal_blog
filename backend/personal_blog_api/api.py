@@ -519,3 +519,74 @@ def delete_comment(jwt_user):
         db.session.rollback()
         return jsonify(dict(message='Delete comment failed', deleted=False)), 500
 
+@api.route('/get_tags', methods=['GET'])
+def get_tags():
+    # tags = Tag.query.all()
+    tags = Tag.query.join(Post.tags).all()
+    json_tags = []
+    for tag in tags:
+        json_tags.append(tag.to_dict())
+
+    return jsonify(json_tags), 200
+
+@api.route('/get_all_posts_by_tag', methods=['GET'])
+@token_required
+@login_required
+def get_all_posts_by_tad(jwt_user):
+    if jwt_user.id != current_user.id:
+        return jsonify(dict(message='Re-authentication required')), 401
+
+    registered_user = User.query.filter_by(id=jwt_user.id).first()
+    if registered_user is None:
+        return jsonify(dict(message='Permission denied')), 401
+
+    page = request.args.get('page', 1, type=int)
+    tag_id = request.args.get('tag_id')
+    posts_per_page = BaseConfig().POSTS_PER_PAGE
+    all_posts = get_posts_by_tag(registered_user.id, True, page, posts_per_page, tag_id)
+
+    json_all_posts = []
+    for p in all_posts.items:
+        json_all_posts.append(p.to_dict_simple())
+
+    return jsonify(dict(posts=json_all_posts,
+                        has_next=all_posts.has_next,
+                        has_prev=all_posts.has_prev,
+                        next_num=all_posts.next_num,
+                        prev_num=all_posts.prev_num)), 200
+
+@api.route('/get_public_posts_by_tag', methods=['GET'])
+def get_public_posts_by_tag():
+    page = request.args.get('page', 1, type=int)
+    tag_id = request.args.get('tag_id')
+    posts_per_page = BaseConfig().POSTS_PER_PAGE
+    all_posts = get_posts_by_tag(None, False, page, posts_per_page, tag_id)
+
+    json_all_posts = []
+    for p in all_posts.items:
+        json_all_posts.append(p.to_dict_simple())
+
+    return jsonify(dict(posts=json_all_posts,
+                        has_next=all_posts.has_next,
+                        has_prev=all_posts.has_prev,
+                        next_num=all_posts.next_num,
+                        prev_num=all_posts.prev_num)), 200
+
+def get_posts_by_tag(author_id, including_private, page, posts_per_page, tag_id):
+    if author_id is None:
+        return Post.query.filter(Post.private_post == False) \
+               .filter(Post.tags.any(id=tag_id)) \
+               .order_by(Post.created_at.desc()) \
+               .paginate(page, posts_per_page, False)
+
+    if including_private == True:
+        return Post.query.filter(Post.author_id == author_id) \
+               .filter(Post.tags.any(id=tag_id)) \
+               .order_by(Post.created_at.desc()) \
+               .paginate(page, posts_per_page, False)
+    else:
+        return Post.query.filter(Post.author_id == author_id) \
+               .filter(Post.private_post == False) \
+               .filter(Post.tags.any(id=tag_id)) \
+               .order_by(Post.created_at.desc()) \
+               .paginate(page, posts_per_page, False)

@@ -69,13 +69,13 @@ import LeftBarProfile from '@/components/LeftBarProfile'
 import LeftBarSearch from '@/components/LeftBarSearch'
 import LeftBarTags from '@/components/LeftBarTags'
 
-import { fetchAllPosts } from '@/api'
-import { fetchPublicPosts } from '@/api'
+import { fetchAllPostsByTag } from '@/api'
+import { fetchPublicPostsByTag } from '@/api'
 import { fetchTags } from '@/api'
 import { key_jwt, key_user_data } from '@/common'
 
 export default {
-    name: 'Home',
+    name: 'Tag',
     components: {
         LeftBarSearch,
         LeftBarTags,
@@ -86,6 +86,7 @@ export default {
             tags: []
         }
     },
+    props: ['tag_id'],
     beforeMount() {
         this.$nextTick(() => {
             this.fetchPosts(this.currentPage)
@@ -144,7 +145,7 @@ export default {
         fetchPosts: function(page) {
             this.$nextTick(() => {
                 if (this.isAuthenticated) {
-                    fetchAllPosts(this.jwt, page)
+                    fetchAllPostsByTag(this.jwt, page, this.tag_id)
                         .then(response => {
                             if (response.status === 200) {
                                 this.setPosts({ posts: response.data['posts'] })
@@ -178,7 +179,7 @@ export default {
                             }
                         })
                 } else {
-                    fetchPublicPosts(page)
+                    fetchPublicPostsByTag(page, this.tag_id)
                         .then(response => {
                             if (response.status === 200) {
                                 this.setPosts({ posts: response.data['posts'] })

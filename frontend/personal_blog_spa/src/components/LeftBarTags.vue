@@ -4,11 +4,10 @@
       <div class="popular-tag left-side-tags left-blog">
         <h4>tags</h4>
         <ul>
-          <li>
-            <a href="#">life</a>
-          </li>
-          <li>
-            <a href="#">sucks</a>
+          <li v-for="tag in tags" :key="tag.tag_id">
+            <router-link :to="{ name: 'Tag', params: { tag_id: tag.tag_id }}">
+              {{ tag.tag_name }}
+            </router-link>
           </li>
         </ul>
       </div>
@@ -24,6 +23,7 @@ export default {
 
         }
     },
+    props: ['tags'],
     methods: {
 
     }

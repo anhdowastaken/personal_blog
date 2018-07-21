@@ -107,3 +107,19 @@ export function submitDeleteComment(jwt, comment_id) {
                        { headers: { Authorization: `Bearer: ${jwt}` },
                          data: { comment_id: comment_id} })
 }
+
+export function fetchTags() {
+    return axios.create({ withCredentials: true })
+                .get(`${API_URL}/get_tags`)
+}
+
+export function fetchAllPostsByTag(jwt, page, tag_id) {
+    return axios.create({ withCredentials: true })
+                .get(`${API_URL}/get_all_posts_by_tag?page=${page}&tag_id=${tag_id}`,
+                      { headers: { Authorization: `Bearer: ${jwt}` } })
+}
+
+export function fetchPublicPostsByTag(page, tag_id) {
+    return axios.create({ withCredentials: true })
+                .get(`${API_URL}/get_public_posts_by_tag?page=${page}&tag_id=${tag_id}`)
+}

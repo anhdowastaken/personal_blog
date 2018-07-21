@@ -7,6 +7,7 @@ import ChangePassword from '@/components/ChangePassword'
 import Post from '@/components/Post'
 import PostNew from '@/components/PostNew'
 import PostUpdate from '@/components/PostUpdate'
+import Tag from '@/components/Tag'
 
 Vue.use(Router)
 
@@ -71,6 +72,12 @@ export default new Router({
           next('/')
         }
       }
+    },
+    {
+      path: '/tag/:tag_id',
+      name: 'Tag',
+      component: Tag,
+      props: true
     }
   ]
 })
