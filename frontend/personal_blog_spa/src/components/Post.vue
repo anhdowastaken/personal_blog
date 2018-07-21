@@ -16,6 +16,7 @@
                       v-on:click.stop.prevent="deletePost()"
                       v-bind:disabled="!isHttpRequestCompleted">Delete Post</button>
             </div>
+            <left-bar-profile></left-bar-profile>
             <left-bar-search></left-bar-search>
             <left-bar-tags></left-bar-tags>
           </div>
@@ -79,6 +80,7 @@ import { mapState } from 'vuex'
 import { mapGetters } from 'vuex'
 import { mapMutations } from 'vuex'
 
+import LeftBarProfile from '@/components/LeftBarProfile'
 import LeftBarSearch from '@/components/LeftBarSearch'
 import LeftBarTags from '@/components/LeftBarTags'
 import Comment from '@/components/Comment'
@@ -102,6 +104,7 @@ export default {
     components: {
         LeftBarSearch,
         LeftBarTags,
+        LeftBarProfile,
         Comment,
         CommentForm,
         quillEditor
@@ -180,6 +183,10 @@ export default {
                             this.setNotificationContent({ header: 'Error',
                                                           body: error.response.data['message'] })
                             this.showNotification()
+
+                            if (error.response.status == 401) {
+                                this.$store.dispatch('logout')
+                            }
                         } else if (error) {
                             this.setNotificationContent({ header: 'Error',
                                                           body: 'Error Authenticating: ' + error })

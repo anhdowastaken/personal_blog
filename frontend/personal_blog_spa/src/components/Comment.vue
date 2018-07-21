@@ -66,7 +66,8 @@ export default {
     methods: {
         ...mapMutations([
             'setNotificationContent',
-            'showNotification'
+            'showNotification',
+            'setNotificationRedirectAfterClose'
         ]),
         deleteComment: function() {
             if (confirm('Are you sure?')) {
@@ -84,6 +85,12 @@ export default {
                             this.setNotificationContent({ header: 'Error',
                                                           body: error.response.data['message'] })
                             this.showNotification()
+
+                            if (error.response.status == 401) {
+                                this.setNotificationRedirectAfterClose({ redirect: true,
+                                                                         component_name: 'Login' })
+                                this.$store.dispatch('logout')
+                            }
                         } else if (error) {
                             this.setNotificationContent({ header: 'Error',
                                                           body: 'Error Authenticating: ' + error })

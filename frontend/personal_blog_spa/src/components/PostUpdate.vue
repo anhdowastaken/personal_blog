@@ -1,7 +1,7 @@
 <template>
   <div class="blog-page area-padding">
     <div class="container">
-      <div class="row" v-if="isAuthenticated && post">
+      <div class="row" v-if="post">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <input type="text" autofocus
                  class="form-control"
@@ -106,10 +106,7 @@ export default {
                 }
             },
             posts: state => state.posts
-        }),
-        ...mapGetters([
-            'isAuthenticated',
-        ])
+        })
     },
     methods: {
         ...mapMutations([
@@ -136,6 +133,10 @@ export default {
                             this.setNotificationContent({ header: 'Error',
                                                           body: error.response.data['message'] })
                             this.showNotification()
+
+                            if (error.response.status == 401) {
+                                this.$store.dispatch('logout')
+                            }
                         } else if (error) {
                             this.setNotificationContent({ header: 'Error',
                                                           body: 'Error Authenticating: ' + error })

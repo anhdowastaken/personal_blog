@@ -134,6 +134,10 @@ export default {
                         this.setNotificationContent({ header: 'Error',
                                                       body: error.response.data['message'] })
                         this.showNotification()
+
+                        if (error.response.status == 401) {
+                            this.$store.dispatch('logout')
+                        }
                     } else if (error) {
                         this.setNotificationContent({ header: 'Error',
                                                       body: 'Error Authenticating: ' + error })
