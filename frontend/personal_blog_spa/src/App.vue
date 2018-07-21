@@ -6,7 +6,7 @@
     <the-header></the-header>
     <the-header-image></the-header-image>
 
-    <router-view/>
+    <router-view :key="$route.fullPath"/>
 
     <the-footer></the-footer>
     <button-go-to-top></button-go-to-top>
