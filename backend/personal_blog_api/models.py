@@ -69,7 +69,7 @@ class Post(db.Model):
 
         tags = []
         for t in self.tags:
-            tags.append(t.name)
+            tags.append(t.to_dict())
 
         return dict(post_id=self.id,
                     header=self.header,
@@ -97,6 +97,7 @@ class Post(db.Model):
         return dict(post_id=self.id,
                     header=self.header,
                     body=self.body,
+                    preview=preview,
                     last_edit_at=int(self.last_edit_at.replace(tzinfo=pytz.utc).timestamp()),
                     author_name=User.query.filter(User.id == self.author_id).first().username,
                     comments=len(comments),

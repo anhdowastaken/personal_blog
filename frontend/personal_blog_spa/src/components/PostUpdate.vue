@@ -99,6 +99,11 @@ export default {
                 .then(response => {
                     if (response.status === 200) {
                         this.post = response.data
+                        let tags = []
+                        for (let i = 0; i < this.post.tags.length; i++) {
+                            tags.push(this.post.tags[i].tag_name)
+                        }
+                        this.post.tags = tags
                     }
                 })
         })

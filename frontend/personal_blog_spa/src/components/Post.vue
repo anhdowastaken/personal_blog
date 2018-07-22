@@ -33,9 +33,13 @@
                   <div class="entry-meta">
                     <span class="author-meta"><i class="fa fa-user"></i>{{ post.author_name }}</span>
                     <span><i class="fa fa-clock-o"></i>{{ post.last_edit_at }}</span>
-                    <span>
+                    <span v-if="post.tags.length > 0">
                       <i class="fa fa-tags"></i>
-                      <a href="#">life</a>
+                      <span v-for="tag in post.tags" :key="tag.tag_id">
+                          <router-link :to="{ name: 'Tag', params: { tag_id: tag.tag_id }}">
+                            {{ tag.tag_name }}
+                          </router-link>&#160;
+                      </span>
                     </span>
                     <span v-if="post.comments.length == 1"><i class="fa fa-comments-o"></i>1 comment</span>
                     <span v-else-if="post.comments.length > 1"><i class="fa fa-comments-o"></i>{{ post.comments.length }} comments</span>
@@ -46,9 +50,6 @@
                                     v-bind:options="config"
                                     v-bind:disabled="quillDisabled">
                     </quill-editor>
-                    <input-tag v-if="post.tags.length > 0"
-                               :read-only="true"
-                               :tags.sync="post.tags"></input-tag>
                   </div>
                 </div>
               </article>
@@ -88,7 +89,6 @@ import LeftBarSearch from '@/components/LeftBarSearch'
 import LeftBarTags from '@/components/LeftBarTags'
 import Comment from '@/components/Comment'
 import CommentForm from '@/components/CommentForm'
-import InputTag from 'vue-input-tag'
 
 import { fetchPost } from '@/api'
 import { submitComment } from '@/api'
@@ -111,8 +111,7 @@ export default {
         LeftBarProfile,
         Comment,
         CommentForm,
-        quillEditor,
-        InputTag
+        quillEditor
     },
     data () {
         return {
