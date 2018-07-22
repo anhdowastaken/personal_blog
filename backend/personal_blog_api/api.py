@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 import time
 from dateutil import parser
 from dateutil.tz import UTC
+from operator import itemgetter
 import pytz
 from functools import wraps
 from flask import Blueprint, jsonify, request, Response, redirect, session
@@ -220,12 +221,19 @@ def get_public_posts():
 
 def get_posts(author_id, including_private, page, posts_per_page):
     if author_id is None:
-        return Post.query.filter(Post.private_post == False).order_by(Post.created_at.desc()).paginate(page, posts_per_page, False)
+        return Post.query.filter(Post.private_post == False) \
+               .order_by(Post.created_at.desc()) \
+               .paginate(page, posts_per_page, False)
 
     if including_private == True:
-        return Post.query.filter(Post.author_id == author_id).order_by(Post.created_at.desc()).paginate(page, posts_per_page, False)
+        return Post.query.filter(Post.author_id == author_id) \
+               .order_by(Post.created_at.desc()) \
+               .paginate(page, posts_per_page, False)
     else:
-        return Post.query.filter(Post.author_id == author_id).filter(Post.private_post == False).order_by(Post.created_at.desc()).paginate(page, posts_per_page, False)
+        return Post.query.filter(Post.author_id == author_id) \
+               .filter(Post.private_post == False) \
+               .order_by(Post.created_at.desc()) \
+               .paginate(page, posts_per_page, False)
 
 @api.route('/create_new_post', methods=['POST'])
 @token_required
@@ -302,9 +310,13 @@ def get_post():
 
     post = None
     if registered_user:
-        post = Post.query.filter(Post.id == post_id).filter(Post.author_id == registered_user.id).first()
+        post = Post.query.filter(Post.id == post_id) \
+               .filter(Post.author_id == registered_user.id) \
+               .first()
     else:
-        post = Post.query.filter(Post.id == post_id).filter(Post.private_post == False).first()
+        post = Post.query.filter(Post.id == post_id) \
+               .filter(Post.private_post == False) \
+               .first()
 
     if post:
         return jsonify(post.to_dict()), 200
@@ -532,7 +544,7 @@ def get_tags():
 @api.route('/get_all_posts_by_tag', methods=['GET'])
 @token_required
 @login_required
-def get_all_posts_by_tad(jwt_user):
+def get_all_posts_by_tag(jwt_user):
     if jwt_user.id != current_user.id:
         return jsonify(dict(message='Re-authentication required')), 401
 
@@ -590,3 +602,54 @@ def get_posts_by_tag(author_id, including_private, page, posts_per_page, tag_id)
                .filter(Post.tags.any(id=tag_id)) \
                .order_by(Post.created_at.desc()) \
                .paginate(page, posts_per_page, False)
+
+@api.route('/search_all_posts_by_keyword', methods=['GET'])
+@token_required
+@login_required
+def search_all_posts_by_keyword(jwt_user):
+    if jwt_user.id != current_user.id:
+        return jsonify(dict(message='Re-authentication required')), 401
+
+    registered_user = User.query.filter_by(id=jwt_user.id).first()
+    if registered_user is None:
+        return jsonify(dict(message='Permission denied')), 401
+
+    page = request.args.get('page', 1, type=int)
+    keyword = request.args.get('keyword')
+    posts_per_page = BaseConfig().POSTS_PER_PAGE
+    query, _ = Post.search(keyword, page, posts_per_page)
+    all_posts = query.filter(Post.author_id == registered_user.id) \
+                .paginate(page, posts_per_page, False)
+
+    json_all_posts = []
+    for p in all_posts.items:
+        json_all_posts.append(p.to_dict_simple())
+    # Because sqlalchemy doesn't support calling multiple order_by() so we will sort here
+    json_all_posts  = sorted(json_all_posts, key=itemgetter('created_at'), reverse=True)
+
+    return jsonify(dict(posts=json_all_posts,
+                        has_next=all_posts.has_next,
+                        has_prev=all_posts.has_prev,
+                        next_num=all_posts.next_num,
+                        prev_num=all_posts.prev_num)), 200
+
+@api.route('/search_public_posts_by_keyword', methods=['GET'])
+def search_public_posts_by_keyword():
+    page = request.args.get('page', 1, type=int)
+    keyword = request.args.get('keyword')
+    posts_per_page = BaseConfig().POSTS_PER_PAGE
+    query, _ = Post.search(keyword, page, posts_per_page)
+    all_posts = query.filter(Post.private_post == False) \
+                .paginate(page, posts_per_page, False)
+
+    json_all_posts = []
+    for p in all_posts.items:
+        json_all_posts.append(p.to_dict_simple())
+    # Because sqlalchemy doesn't support calling multiple order_by() so we will sort here
+    json_all_posts  = sorted(json_all_posts, key=itemgetter('created_at'), reverse=True)
+
+    return jsonify(dict(posts=json_all_posts,
+                        has_next=all_posts.has_next,
+                        has_prev=all_posts.has_prev,
+                        next_num=all_posts.next_num,
+                        prev_num=all_posts.prev_num)), 200

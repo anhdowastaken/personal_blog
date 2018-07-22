@@ -8,6 +8,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
+from elasticsearch import Elasticsearch
 from .config import BaseConfig
 
 # Configure logger
@@ -26,6 +27,9 @@ def load_user(user_id):
     return User.query.filter_by(id = user_id).first()
 
 bcrypt = Bcrypt()
+
+elasticsearch = Elasticsearch([BaseConfig().ELASTICSEARCH_URL]) \
+    if BaseConfig().ELASTICSEARCH_URL else None
 
 def create_app(app_name='PERSONALBLOG_API'):
     app_logger.info('Create app {}'.format(app_name))

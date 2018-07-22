@@ -123,3 +123,14 @@ export function fetchPublicPostsByTag(page, tag_id) {
     return axios.create({ withCredentials: true })
                 .get(`${API_URL}/get_public_posts_by_tag?page=${page}&tag_id=${tag_id}`)
 }
+
+export function searchAllPostsByKeyword(jwt, page, keyword) {
+    return axios.create({ withCredentials: true })
+                .get(`${API_URL}/search_all_posts_by_keyword?page=${page}&keyword=${keyword}`,
+                      { headers: { Authorization: `Bearer: ${jwt}` } })
+}
+
+export function searchPublicPostsByKeyword(page, keyword) {
+    return axios.create({ withCredentials: true })
+                .get(`${API_URL}/search_public_posts_by_keyword?page=${page}&keyword=${keyword}`)
+}

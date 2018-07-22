@@ -3,8 +3,10 @@
     <!-- search option start -->
     <form action="#">
       <div class="search-option">
-        <input type="text" placeholder="Search...">
-        <button class="button" type="submit">
+        <input type="text" placeholder="Search..." v-model="keyword">
+        <button class="button" type="submit"
+                v-on:click.stop.prevent="search()"
+                v-on:submit.stop.prevent="search()">
           <i class="fa fa-search"></i>
         </button>
       </div>
@@ -18,11 +20,13 @@ export default {
     name: 'LeftBarSearch',
     data() {
         return {
-
+            keyword: ''
         }
     },
     methods: {
-
+        search: function(keyword) {
+            this.$router.push({ name: 'Search', params: { keyword: this.keyword }})
+        }
     }
 }
 </script>

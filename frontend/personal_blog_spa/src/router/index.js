@@ -8,6 +8,7 @@ import Post from '@/components/Post'
 import PostNew from '@/components/PostNew'
 import PostUpdate from '@/components/PostUpdate'
 import Tag from '@/components/Tag'
+import Search from '@/components/Search'
 
 Vue.use(Router)
 
@@ -77,6 +78,12 @@ export default new Router({
       path: '/tag/:tag_id',
       name: 'Tag',
       component: Tag,
+      props: true
+    },
+    {
+      path: '/search/:keyword',
+      name: 'Search',
+      component: Search,
       props: true
     }
   ]
